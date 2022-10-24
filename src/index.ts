@@ -1,7 +1,11 @@
 require("dotenv").config();
 const con = require("./db_connection").getConnection();
-const path = require("path");
-import { authRouter, recipeRouter, registerRouter } from "./routes";
+import {
+  authRouter,
+  recipeRouter,
+  registerRouter,
+  uploadRouter,
+} from "./routes";
 import { Connection } from "mysql2/promise";
 
 const express = require("express");
@@ -38,10 +42,11 @@ const { infoLog } = require("./utils/logger");
 
 con.then((con: Connection) => app.set("db", con));
 app.use(express.json());
-app.get("/", express.static(path.join(__dirname, "./public")));
+app.use("/public", express.static("public"));
 app.use("/auth", authRouter);
 app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
+app.use("/upload", uploadRouter);
 
 app.listen(port, () => {
   infoLog(`Server started on ${port} port`);
