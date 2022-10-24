@@ -1,6 +1,8 @@
-export interface IUser {
-    id: string,
-    email: string,
-    password?: string,
-    token: string,
+import { RowDataPacket } from "mysql2";
+
+export interface IUser extends RowDataPacket {
+  id: string;
+  email: string;
+  password?: string;
+  token: string;
 }

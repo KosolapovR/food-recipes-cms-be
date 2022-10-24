@@ -1,5 +1,5 @@
-import {authRouter} from './auth';
+import { authRouter } from "./auth";
+import { recipeRouter } from "./recipe";
+import { registerRouter } from "./register";
 
-export {
-    authRouter,
-}
+export { authRouter, recipeRouter, registerRouter };

@@ -1,18 +1,36 @@
 import chalk from "chalk";
+import util from "util";
 
-const warningLog = (s: string) => {
-    console.log(chalk.hex('#FFA500')(s))
-} ;
-const errorLog = (s: string) => {
-    console.log(chalk.bold.red(s))
-} ;
+const warningLog = function (...args: any[]) {
+  const prepared: string[] = [];
+  args.forEach((arg: any) => {
+    if (typeof arg === "object") {
+      prepared.push(util.inspect(arg, false, 3, true));
+    }
+    prepared.push(arg);
+  });
+  console.log(chalk.hex("#FFA500")(...prepared));
+};
+const errorLog = function (...args: any[]) {
+  const prepared: string[] = [];
+  args.forEach((arg: any) => {
+    if (typeof arg === "object") {
+      prepared.push(util.inspect(arg, false, 3, true));
+    }
+    prepared.push(arg);
+  });
+  console.log(chalk.bold.red(...prepared));
+};
 
-const infoLog = (s: string) => {
-    console.log(chalk.blueBright.bold(s));
-} ;
+const infoLog = function (...args: any[]) {
+  const prepared: string[] = [];
+  args.forEach((arg: any) => {
+    if (typeof arg === "object") {
+      prepared.push(util.inspect(arg, false, 3, true));
+    }
+    prepared.push(arg);
+  });
+  console.log(chalk.bold.blueBright(...prepared));
+};
 
-export {
-    warningLog,
-    errorLog,
-    infoLog,
-}
+export { warningLog, errorLog, infoLog };

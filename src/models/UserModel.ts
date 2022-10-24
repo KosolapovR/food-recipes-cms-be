@@ -1,4 +1,4 @@
-import {IUser} from "../interfaces/User";
+import { IUser } from "../interfaces";
 /**
  * @typedef UserModel
  * @property {string} id.required
@@ -6,5 +6,5 @@ import {IUser} from "../interfaces/User";
  * @property {string} token
  */
 export interface UserModel {
-    model: IUser
+  model: IUser;
 }

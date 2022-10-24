@@ -1,7 +1,3 @@
-import {warningLog, errorLog, infoLog} from "./logger"
+import { warningLog, errorLog, infoLog } from "./logger";
 
-export {
-    warningLog,
-    infoLog,
-    errorLog
-}
+export { warningLog, infoLog, errorLog };
