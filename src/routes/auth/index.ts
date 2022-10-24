@@ -1,6 +1,4 @@
-// @ts-ignore
 import bcrypt from "bcryptjs";
-// @ts-ignore
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
@@ -46,7 +44,7 @@ router.post(
       bcrypt.compare(
         password,
         user.password,
-        (err: string, isValid: boolean) => {
+        (err: Error, isValid: boolean) => {
           if (err) {
             errorLog(err);
           }

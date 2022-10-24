@@ -1,6 +1,4 @@
-// @ts-ignore
 import bcrypt from "bcryptjs";
-// @ts-ignore
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { Connection, ResultSetHeader } from "mysql2/promise";
