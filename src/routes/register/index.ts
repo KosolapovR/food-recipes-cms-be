@@ -28,7 +28,7 @@ router.post("/", async function (req: Request, res: Response) {
 
     const db: Connection = req.app.get("db");
     const { users } = getRepository(db);
-    const [oldUser] = await users.getAllByField({
+    const [oldUser] = await users.getByField({
       fieldName: "email",
       fieldValue: email,
     });

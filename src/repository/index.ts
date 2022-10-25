@@ -2,25 +2,31 @@ import { Connection } from "mysql2/promise";
 import {
   add as addUser,
   getAll as getAllUsers,
-  getAllByField as getAllUsersByField,
+  getByField as getUsersByField,
 } from "./user";
 import {
   getAll as getAllRecipes,
-  getAllByField as getAllByFieldRecipes,
+  getByField as getByFieldRecipes,
   add as addRecipe,
-  getById,
+  getById as getByIdRecipe,
+  update as updateRecipe,
+  removeById as removeByIdRecipe,
+  removeAllByIds as removeAllByIdsRecipes,
 } from "./recipe";
 
 export const getRepository = (db: Connection) => ({
   users: {
     getAll: getAllUsers(db),
-    getAllByField: getAllUsersByField(db),
+    getByField: getUsersByField(db),
     add: addUser(db),
   },
   recipes: {
-    getById: getById(db),
+    getById: getByIdRecipe(db),
     getAll: getAllRecipes(db),
-    getAllByField: getAllByFieldRecipes(db),
+    getByField: getByFieldRecipes(db),
     add: addRecipe(db),
+    update: updateRecipe(db),
+    removeById: removeByIdRecipe(db),
+    removeAllByIds: removeAllByIdsRecipes(db),
   },
 });

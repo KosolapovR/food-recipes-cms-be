@@ -33,6 +33,7 @@ let options = {
       },
     },
   },
+  route: { url: "/api/swagger", docs: "/api/swagger.json" },
   basedir: __dirname, //app absolute path
   files: ["./routes/**/*.ts", "./models/*.ts"], //Path to the API handle folder
 };

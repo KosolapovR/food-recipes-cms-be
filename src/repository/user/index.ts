@@ -8,7 +8,7 @@ const getAll = (db: Connection) => async () => {
   return rows;
 };
 
-const getAllByField =
+const getByField =
   (db: Connection) =>
   async ({ fieldName, fieldValue }: IFieldNameValue) => {
     const [rows] = await db.query<IUser[]>(
@@ -26,4 +26,4 @@ const add =
     return rows;
   };
 
-export { getAll, getAllByField, add };
+export { getAll, getByField, add };

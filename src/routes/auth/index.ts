@@ -33,7 +33,7 @@ router.post(
 
       const db: Connection = req.app.get("db");
       const { users } = getRepository(db);
-      const [user]: IUser[] = await users.getAllByField({
+      const [user]: IUser[] = await users.getByField({
         fieldName: "email",
         fieldValue: email,
       });
