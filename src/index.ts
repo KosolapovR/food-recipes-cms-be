@@ -1,12 +1,11 @@
 require("dotenv").config();
-const con = require("./db_connection").getConnection();
+
 import {
   authRouter,
   recipeRouter,
   registerRouter,
   uploadRouter,
 } from "./routes";
-import { Connection } from "mysql2/promise";
 
 const express = require("express");
 const app = express();
@@ -41,7 +40,6 @@ expressSwagger(options);
 
 const { infoLog } = require("./utils/logger");
 
-con.then((con: Connection) => app.set("db", con));
 app.use(express.json());
 app.use("/public", express.static("public"));
 app.use("/auth", authRouter);

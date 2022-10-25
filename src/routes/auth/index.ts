@@ -2,11 +2,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { Connection } from "mysql2/promise";
 
 import { errorLog, warningLog } from "../../utils";
 import { IUser } from "../../interfaces";
-import { getRepository } from "../../repository";
+import { userRepo } from "../../repository";
 
 const router = express.Router();
 
@@ -31,9 +30,7 @@ router.post(
         res.status(400).send("All input is required");
       }
 
-      const db: Connection = req.app.get("db");
-      const { users } = getRepository(db);
-      const [user]: IUser[] = await users.getByField({
+      const [user]: IUser[] = await userRepo.getByField({
         fieldName: "email",
         fieldValue: email,
       });

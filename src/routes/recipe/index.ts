@@ -1,10 +1,8 @@
-// @ts-ignore
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { protectedRoute } from "../../middlewares/protectedRoute";
-import { Connection } from "mysql2/promise";
 
-import { getRepository } from "../../repository";
+import { protectedRoute } from "../../middlewares/protectedRoute";
+import { recipeRepo } from "../../repository";
 import { errorLog } from "../../utils";
 
 const router = express.Router();
@@ -32,9 +30,7 @@ router.post(
         res.status(400).send("All input is required");
       }
 
-      const db: Connection = req.app.get("db");
-      const { recipes } = getRepository(db);
-      const recipe = await recipes.add({
+      const recipe = await recipeRepo.add({
         title,
         steps,
         previewImagePath,
@@ -73,9 +69,7 @@ router.put(
         res.status(400).send("All input is required");
       }
 
-      const db: Connection = req.app.get("db");
-      const { recipes } = getRepository(db);
-      const recipe = await recipes.update({
+      const recipe = await recipeRepo.update({
         id,
         title,
         steps,
@@ -102,9 +96,7 @@ router.put(
  */
 router.get("/GetPage", async function (req: Request, res: Response) {
   try {
-    const db: Connection = req.app.get("db");
-    const { recipes } = getRepository(db);
-    const result = await recipes.getAll();
+    const result = await recipeRepo.getAll();
     if (!result) {
       errorLog("Cannot get recipes", result);
       res.status(400).send("Cannot get recipes");
@@ -132,9 +124,7 @@ router.post("/Delete", async function (req: Request, res: Response) {
       res.status(400).send("All input is required");
     }
 
-    const db: Connection = req.app.get("db");
-    const { recipes } = getRepository(db);
-    const result = await recipes.removeById({ id });
+    const result = await recipeRepo.removeById({ id });
     if (!result) {
       res.status(400).send("Cannot delete recipe");
     }
@@ -161,11 +151,7 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
       res.status(400).send("All input is required");
     }
 
-    const db: Connection = req.app.get("db");
-    const { recipes } = getRepository(db);
-    errorLog("ids", ids);
-    console.log("ids", ids);
-    const result = await recipes.removeAllByIds({ ids });
+    const result = await recipeRepo.removeAllByIds({ ids });
     if (!result) {
       res.status(400).send("Cannot delete recipes");
     }
