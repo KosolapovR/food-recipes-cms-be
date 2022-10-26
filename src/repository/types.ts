@@ -1,5 +1,4 @@
 export interface IFieldNameValue {
   fieldName: string;
-  fieldValue: string;
+  fieldValue: string | number | boolean;
 }
-

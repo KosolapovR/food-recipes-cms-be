@@ -88,13 +88,13 @@ router.put(
 );
 
 /**
- * @route GET /recipe/GetPage
+ * @route GET /recipe
  * @group Recipe - Operations about recipe
  * @returns {Array.<RecipeModel>} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.get("/GetPage", async function (req: Request, res: Response) {
+router.get("/", async function (req: Request, res: Response) {
   try {
     const result = await recipeRepo.getAll();
     if (!result) {
@@ -102,7 +102,34 @@ router.get("/GetPage", async function (req: Request, res: Response) {
       res.status(400).send("Cannot get recipes");
     }
 
-    res.status(201).send({ data: result });
+    res.status(200).send({ data: result });
+  } catch (err) {
+    errorLog(err);
+  }
+});
+
+/**
+ * @route GET /recipe/{id}
+ * @param {string} id.params.required
+ * @group Recipe - Operations about recipe
+ * @returns {RecipeModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.get("/:id", async function (req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params.id);
+    if (!id || Number.isNaN(id)) {
+      errorLog("Cannot get recipe by id", req.params.id);
+      res.status(400).send(`Cannot get recipe by id ${req.params.id}`);
+    }
+    const result = await recipeRepo.getById(id);
+    if (!result) {
+      errorLog("Cannot get recipe", result);
+      res.status(400).send("Cannot get recipe");
+    }
+
+    res.status(200).send({ data: result });
   } catch (err) {
     errorLog(err);
   }

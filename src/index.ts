@@ -5,6 +5,7 @@ import {
   recipeRouter,
   registerRouter,
   uploadRouter,
+  commentRouter,
 } from "./routes";
 
 const express = require("express");
@@ -43,6 +44,7 @@ const { infoLog } = require("./utils/logger");
 app.use(express.json());
 app.use("/public", express.static("public"));
 app.use("/auth", authRouter);
+app.use("/comment", commentRouter);
 app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
 app.use("/upload", uploadRouter);
