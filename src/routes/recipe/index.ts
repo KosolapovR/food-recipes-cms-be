@@ -121,12 +121,12 @@ router.get("/:id", async function (req: Request, res: Response) {
     const id = parseInt(req.params.id);
     if (!id || Number.isNaN(id)) {
       errorLog("Cannot get recipe by id", req.params.id);
-      res.status(400).send(`Cannot get recipe by id ${req.params.id}`);
+      return res.status(400).send(`Cannot get recipe by id ${req.params.id}`);
     }
     const result = await recipeRepo.getById(id);
     if (!result) {
       errorLog("Cannot get recipe", result);
-      res.status(400).send("Cannot get recipe");
+      return res.status(400).send("Cannot get recipe");
     }
 
     res.status(200).send({ data: result });

@@ -6,6 +6,7 @@ import {
   registerRouter,
   uploadRouter,
   commentRouter,
+  userRouter,
 } from "./routes";
 
 const express = require("express");
@@ -48,6 +49,7 @@ app.use("/comment", commentRouter);
 app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
 app.use("/upload", uploadRouter);
+app.use("/user", userRouter);
 
 app.listen(port, () => {
   infoLog(`Server started on ${port} port`);

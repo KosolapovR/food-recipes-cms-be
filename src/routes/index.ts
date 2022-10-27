@@ -3,6 +3,7 @@ import { recipeRouter } from "./recipe";
 import { registerRouter } from "./register";
 import { uploadRouter } from "./upload";
 import { commentRouter } from "./comment";
+import { userRouter } from "./user";
 
 export {
   authRouter,
@@ -10,4 +11,5 @@ export {
   registerRouter,
   uploadRouter,
   commentRouter,
+  userRouter,
 };

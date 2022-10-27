@@ -20,7 +20,8 @@ const getById = async (id: number) => {
   const [rows] = await db.query<IUser[]>(`SELECT * FROM users WHERE id=?`, [
     id,
   ]);
-  return rows;
+  const user: IUser | undefined = rows[0];
+  return user;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
@@ -35,25 +36,33 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
 const add = async ({ email, password, isAdmin }: ICreateUserParams) => {
   const db = await getConnection();
   const [rows] = await db.query<ResultSetHeader>(
-    `INSERT INTO users (email, password, is_admin) values (?, ?, ?)`,
+    `INSERT INTO users (email, password, isAdmin) values (?, ?, ?)`,
     [email, password, isAdmin]
   );
   return rows;
 };
 
-const update = async ({ id, email, isAdmin }: IUpdateUserParams) => {
+const update = async ({ id, email, password, isAdmin }: IUpdateUserParams) => {
   const db = await getConnection();
-  await db.query<ResultSetHeader>(
-    `UPDATE users SET email='${email}', isAdmin='${isAdmin}' WHERE id=${id}`
-  );
-
+  if (password) {
+    await db.query<ResultSetHeader>(
+      `UPDATE users SET email=?, password=?, isAdmin=? WHERE id=?`,
+      [email, password, isAdmin, id]
+    );
+  } else {
+    await db.query<ResultSetHeader>(
+      `UPDATE users SET email=?, isAdmin=? WHERE id=?`,
+      [email, isAdmin, id]
+    );
+  }
   return await getById(id);
 };
 
 const removeById = async ({ id }: IDeleteUserParams) => {
   const db = await getConnection();
   const [result] = await db.query<ResultSetHeader>(
-    `DELETE FROM users WHERE id=${id}`
+    `DELETE FROM users WHERE id=?`,
+    [id]
   );
   return result.affectedRows === 1;
 };

@@ -4,7 +4,7 @@ export interface ICreateUserParams {
   isAdmin?: boolean;
 }
 
-export interface IUpdateUserParams extends Omit<ICreateUserParams, "password"> {
+export interface IUpdateUserParams extends ICreateUserParams {
   id: number;
 }
 

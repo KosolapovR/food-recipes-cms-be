@@ -22,7 +22,7 @@ exports.up = function (db, callback) {
       title: "string",
       text: { type: "string", notNull: true },
       imagePath: "string",
-      recipe_id: {
+      recipeId: {
         type: "int",
         foreignKey: {
           name: "recipe_steps_recipe_fk",

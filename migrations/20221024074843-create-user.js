@@ -24,7 +24,7 @@ exports.up = function (db, callback) {
       id: { type: "int", autoIncrement: true, primaryKey: true },
       email: { type: "string", unique: true, notNull: true },
       password: { type: "string", notNull: true },
-      is_admin: { type: "boolean", default: false },
+      isAdmin: { type: "boolean", default: false },
     },
     createAdmin
   );
@@ -34,7 +34,7 @@ exports.up = function (db, callback) {
       return;
     }
     db.runSql(
-      "INSERT INTO users (email, password, is_admin) values ('admin@mail.ru', '$2y$10$bBA63.sfLmOyG9aqS8aKY.TyRZfFN1HiWaLWJfHZdQVUuQVpsnVQ2', true)",
+      "INSERT INTO users (email, password, isAdmin) values ('admin@mail.ru', '$2y$10$bBA63.sfLmOyG9aqS8aKY.TyRZfFN1HiWaLWJfHZdQVUuQVpsnVQ2', true)",
       callback
     );
   }

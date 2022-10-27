@@ -64,7 +64,7 @@ router.post(
  */
 router.put(
   "/Update",
-  body("title").not().isEmpty().trim(),
+  body("text").not().isEmpty().trim(),
   async function (req: Request, res: Response) {
     try {
       const { id, text, userId, recipeId, date, status } = req.body;

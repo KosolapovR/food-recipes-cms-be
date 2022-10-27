@@ -18,12 +18,13 @@ const getById = async (id: number) => {
   );
   if (!rows) return rows;
 
-  const recipe: IRecipe = rows[0];
+  const recipe: IRecipe | undefined = rows[0];
+  if (!recipe) return recipe;
+
   const [steps] = await db.query<IRecipeStep[]>(
-    `SELECT * FROM recipe_steps WHERE recipe_id=?`,
+    `SELECT * FROM recipe_steps WHERE recipeId=?`,
     [id]
   );
-
   const comments = await commentRepo.getByField({
     fieldName: "recipeId",
     fieldValue: recipe.id,
@@ -38,7 +39,7 @@ const getAll = async () => {
   const [recipes] = await db.query<IRecipe[]>("SELECT * FROM recipes");
   for (let i = 0; i < recipes.length; i++) {
     const [steps] = await db.query<IRecipeStep[]>(
-      `SELECT * FROM recipe_steps WHERE recipe_id=?`,
+      `SELECT * FROM recipe_steps WHERE recipeId=?`,
       [recipes[i].id]
     );
     const comments = await commentRepo.getByField({
@@ -61,7 +62,7 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
 
   for (let i = 0; i < recipes.length; i++) {
     const [steps] = await db.query<IRecipeStep[]>(
-      `SELECT * FROM recipe_steps WHERE recipe_id=?`,
+      `SELECT * FROM recipe_steps WHERE recipeId=?`,
       [recipes[i].id]
     );
     const comments = await commentRepo.getByField({
@@ -84,7 +85,7 @@ const add = async ({ title, steps, previewImagePath }: ICreateRecipeParams) => {
   );
   for (let i = 0; i < steps.length; i++) {
     await db.query<ResultSetHeader>(
-      `INSERT INTO recipe_steps (recipe_id, title, text, imagePath) values (?, ?, ?, ?)`,
+      `INSERT INTO recipe_steps (recipeId, title, text, imagePath) values (?, ?, ?, ?)`,
       [result.insertId, steps[i].title, steps[i].text, steps[i].imagePath]
     );
   }

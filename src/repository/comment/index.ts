@@ -15,8 +15,8 @@ const getById = async (id: number) => {
     `SELECT * FROM comments WHERE comments.id=?`,
     [id]
   );
-
-  return rows;
+  const comment: IComment | undefined = rows[0];
+  return comment;
 };
 
 const getAll = async () => {
