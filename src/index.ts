@@ -10,6 +10,8 @@ import {
 } from "./routes";
 
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 const expressSwagger = require("express-swagger-generator")(app);
 
@@ -42,6 +44,11 @@ expressSwagger(options);
 
 const { infoLog } = require("./utils/logger");
 
+app.use(
+  cors({
+    origin: "http://localhost:5000",
+  })
+);
 app.use(express.json());
 app.use("/public", express.static("public"));
 app.use("/auth", authRouter);
