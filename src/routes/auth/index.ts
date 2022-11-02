@@ -16,7 +16,7 @@ const router = express.Router();
  * @param {string} password.body.required
  * @returns {UserModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  404 - Wrong credentials
  */
 router.post(
   "/",
@@ -47,7 +47,7 @@ router.post(
           }
 
           if (!isValid) {
-            return res.status(403).send("Wrong credentials");
+            return res.status(404).send("Wrong credentials");
           }
 
           // save user token

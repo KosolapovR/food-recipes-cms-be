@@ -15,6 +15,7 @@ export interface RecipeStepModel {
  * @typedef RecipeModel
  * @property {string} id.required
  * @property {string} title.required
+ * @property {string} status
  * @property {string} previewImagePath.required
  * @property {Array.<RecipeStepModel>} steps
  * @property {Array.<CommentModel>} comments

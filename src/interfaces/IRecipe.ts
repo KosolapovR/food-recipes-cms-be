@@ -8,10 +8,13 @@ export interface IRecipeStep extends RowDataPacket {
   imagePath?: string;
 }
 
+export type RecipeStatusType = "inactive" | "active";
+
 export interface IRecipe extends RowDataPacket {
   id: number;
   title: string;
   steps: IRecipeStep[];
   comments: IComment[];
+  status: RecipeStatusType;
   previewImagePath: string;
 }

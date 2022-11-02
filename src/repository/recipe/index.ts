@@ -76,12 +76,17 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   return recipes;
 };
 
-const add = async ({ title, steps, previewImagePath }: ICreateRecipeParams) => {
+const add = async ({
+  title,
+  steps,
+  status,
+  previewImagePath,
+}: ICreateRecipeParams) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
-    `INSERT INTO recipes (title, previewImagePath) values (?, ?)`,
-    [title, previewImagePath]
+    `INSERT INTO recipes (title, previewImagePath, status) values (?, ?, ?)`,
+    [title, previewImagePath, status]
   );
   for (let i = 0; i < steps.length; i++) {
     await db.query<ResultSetHeader>(
@@ -97,12 +102,13 @@ const update = async ({
   title,
   steps,
   previewImagePath,
+  status,
 }: IUpdateRecipeParams) => {
   const db = await getConnection();
 
   await db.query<ResultSetHeader>(
-    `UPDATE recipes SET title=?, previewImagePath=? WHERE id=?`,
-    [title, previewImagePath, id]
+    `UPDATE recipes SET title=?, previewImagePath=?, status=? WHERE id=?`,
+    [title, previewImagePath, status, id]
   );
 
   for (let i = 0; i < steps.length; i++) {

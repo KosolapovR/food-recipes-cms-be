@@ -27,13 +27,14 @@ router.post(
       const { title, steps, previewImagePath } = req.body;
 
       if (!(title && steps)) {
-        res.status(400).send("All input is required");
+        res.status(400).send("Required fields: title, steps");
       }
 
       const recipe = await recipeRepo.add({
         title,
         steps,
         previewImagePath,
+        status: "inactive",
       });
       if (!recipe) {
         errorLog("Cannot add recipe", recipe);
@@ -63,9 +64,9 @@ router.put(
   body("title").not().isEmpty().trim(),
   async function (req: Request, res: Response) {
     try {
-      const { id, title, steps, previewImagePath } = req.body;
+      const { id, title, steps, status, previewImagePath } = req.body;
 
-      if (!(title && steps)) {
+      if (!(title && steps && status)) {
         res.status(400).send("All input is required");
       }
 
@@ -74,6 +75,7 @@ router.put(
         title,
         steps,
         previewImagePath,
+        status,
       });
       if (!recipe) {
         errorLog("Cannot update recipe", recipe);
@@ -91,12 +93,22 @@ router.put(
  * @route GET /recipe
  * @group Recipe - Operations about recipe
  * @returns {Array.<RecipeModel>} 200
- * @returns {Error}  400 - All input is required
+ * @returns {Error}  400
  * @returns {Error}  403 - Wrong credentials
  */
 router.get("/", async function (req: Request, res: Response) {
+  const { status } = req.query;
   try {
-    const result = await recipeRepo.getAll();
+    let result;
+    if (status) {
+      result = await recipeRepo.getByField({
+        fieldName: "status",
+        fieldValue: status as string,
+      });
+    } else {
+      result = await recipeRepo.getAll();
+    }
+
     if (!result) {
       errorLog("Cannot get recipes", result);
       res.status(400).send("Cannot get recipes");

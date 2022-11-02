@@ -20,6 +20,7 @@ exports.up = function (db, callback) {
     {
       id: { type: "int", autoIncrement: true, primaryKey: true },
       title: { type: "string", notNull: true },
+      status: "string",
       previewImagePath: { type: "string" },
     },
     callback
