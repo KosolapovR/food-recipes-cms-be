@@ -15,5 +15,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }} # User of the server you want to ssh into
           script: |
             git -C app pull || git clone git@github.com:KosolapovR/food-recipes-cms-be.git app
+            cd ./app
             docker-compose up
             echo 'Deployment successful to digital ocean'
