@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:10
 
 WORKDIR /usr/app
 COPY package.json .
@@ -10,7 +10,5 @@ COPY . /usr/app
 
 RUN ["chmod", "+x", "/usr/app/wait-for-it.sh"]
 
-#RUN npm run migrate
-#RUN npm run build
 
 
