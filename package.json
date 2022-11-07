@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "./node_modules/.bin/db-migrate up",
+    "migrate": "db-migrate up",
     "build": "tsc",
     "start": "npm run migrate && npm run build && node ./dist/index.js",
     "dev": "db-migrate up && npx nodemon src/index.ts"
