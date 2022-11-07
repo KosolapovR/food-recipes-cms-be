@@ -1,5 +1,4 @@
-import { IRecipe } from "../interfaces";
-import { IRecipeStep } from "../interfaces/Recipe";
+import { IRecipe, IRecipeStep } from "../interfaces";
 
 /**
  * @typedef RecipeStepModel
@@ -16,8 +15,10 @@ export interface RecipeStepModel {
  * @typedef RecipeModel
  * @property {string} id.required
  * @property {string} title.required
+ * @property {string} status
  * @property {string} previewImagePath.required
  * @property {Array.<RecipeStepModel>} steps
+ * @property {Array.<CommentModel>} comments
  */
 export interface RecipeModel {
   model: IRecipe;

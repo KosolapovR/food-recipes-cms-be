@@ -1,13 +1,11 @@
-// @ts-ignore
 import bcrypt from "bcryptjs";
-// @ts-ignore
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
-import { Connection, ResultSetHeader } from "mysql2/promise";
+import { ResultSetHeader } from "mysql2/promise";
 
 import { UserModel } from "../../models/UserModel";
-import { getRepository } from "../../repository";
 import { errorLog, warningLog } from "../../utils";
+import { userRepo } from "../../repository";
 
 const router = express.Router();
 
@@ -22,15 +20,13 @@ const router = express.Router();
  */
 router.post("/", async function (req: Request, res: Response) {
   try {
-    const { email, password } = req.body;
+    const { email, password, isAdmin } = req.body;
 
     if (!(email && password)) {
       res.status(400).send("All input is required");
     }
 
-    const db: Connection = req.app.get("db");
-    const { users } = getRepository(db);
-    const [oldUser] = await users.getAllByField({
+    const [oldUser] = await userRepo.getByField({
       fieldName: "email",
       fieldValue: email,
     });
@@ -44,9 +40,10 @@ router.post("/", async function (req: Request, res: Response) {
     //Encrypt user password
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const result: ResultSetHeader = await users.add({
+    const result: ResultSetHeader = await userRepo.add({
       email,
       password: encryptedPassword,
+      isAdmin,
     });
     if (!result.insertId) {
       errorLog("User not created", result);

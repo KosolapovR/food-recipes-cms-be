@@ -1,14 +1,11 @@
-// @ts-ignore
 import bcrypt from "bcryptjs";
-// @ts-ignore
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import { Connection } from "mysql2/promise";
 
 import { errorLog, warningLog } from "../../utils";
 import { IUser } from "../../interfaces";
-import { getRepository } from "../../repository";
+import { userRepo } from "../../repository";
 
 const router = express.Router();
 
@@ -19,7 +16,7 @@ const router = express.Router();
  * @param {string} password.body.required
  * @returns {UserModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  404 - Wrong credentials
  */
 router.post(
   "/",
@@ -33,9 +30,7 @@ router.post(
         res.status(400).send("All input is required");
       }
 
-      const db: Connection = req.app.get("db");
-      const { users } = getRepository(db);
-      const [user]: IUser[] = await users.getAllByField({
+      const [user]: IUser[] = await userRepo.getByField({
         fieldName: "email",
         fieldValue: email,
       });
@@ -46,13 +41,13 @@ router.post(
       bcrypt.compare(
         password,
         user.password,
-        (err: string, isValid: boolean) => {
+        (err: Error, isValid: boolean) => {
           if (err) {
             errorLog(err);
           }
 
           if (!isValid) {
-            return res.status(403).send("Wrong credentials");
+            return res.status(404).send("Wrong credentials");
           }
 
           // save user token

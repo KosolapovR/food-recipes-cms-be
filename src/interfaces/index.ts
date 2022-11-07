@@ -1,4 +1,5 @@
-import { IUser } from "./User";
-import { IRecipe } from "./Recipe";
+import { IUser } from "./IUser";
+import { IRecipe, IRecipeStep } from "./IRecipe";
+import { IComment } from "./IComment";
 
-export { IRecipe, IUser };
+export { IRecipe, IRecipeStep, IUser, IComment };

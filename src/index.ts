@@ -1,14 +1,21 @@
 require("dotenv").config();
-const con = require("./db_connection").getConnection();
-const path = require("path");
-import { authRouter, recipeRouter, registerRouter } from "./routes";
-import { Connection } from "mysql2/promise";
+
+import {
+  authRouter,
+  recipeRouter,
+  registerRouter,
+  uploadRouter,
+  commentRouter,
+  userRouter,
+} from "./routes";
 
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
 const expressSwagger = require("express-swagger-generator")(app);
 
-const port = 8163;
+const port = process.env.NODE_DOCKER_PORT || 8080;
 
 let options = {
   swaggerDefinition: {
@@ -29,6 +36,7 @@ let options = {
       },
     },
   },
+  route: { url: "/api/swagger", docs: "/api/swagger.json" },
   basedir: __dirname, //app absolute path
   files: ["./routes/**/*.ts", "./models/*.ts"], //Path to the API handle folder
 };
@@ -36,12 +44,19 @@ expressSwagger(options);
 
 const { infoLog } = require("./utils/logger");
 
-con.then((con: Connection) => app.set("db", con));
+app.use(
+  cors({
+    origin: "http://localhost:5000",
+  })
+);
 app.use(express.json());
-app.get("/", express.static(path.join(__dirname, "./public")));
+app.use("/public", express.static("public"));
 app.use("/auth", authRouter);
+app.use("/comment", commentRouter);
 app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
+app.use("/upload", uploadRouter);
+app.use("/user", userRouter);
 
 app.listen(port, () => {
   infoLog(`Server started on ${port} port`);

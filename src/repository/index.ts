@@ -1,10 +1,5 @@
-import { Connection } from "mysql2/promise";
-import { add, getAll, getAllByField } from "./user";
+import * as userRepo from "./user";
+import * as recipeRepo from "./recipe";
+import * as commentRepo from "./comment";
 
-export const getRepository = (db: Connection) => ({
-  users: {
-    getAll: getAll(db),
-    getAllByField: getAllByField(db),
-    add: add(db),
-  },
-});
+export { userRepo, recipeRepo, commentRepo };
