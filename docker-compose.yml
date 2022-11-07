@@ -3,7 +3,9 @@ version: '3.8'
 services:
   mysqldb:
     image: mysql:5.7
+    restart: unless-stopped
     env_file: ./.env
+    container_name: mysqldb
     environment:
       - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
       - MYSQL_DATABASE=$MYSQLDB_DATABASE
@@ -14,7 +16,10 @@ services:
   app:
     depends_on:
       - mysqldb
+    command: ["./wait-for-it.sh", "mysqldb:${MYSQLDB_DOCKER_PORT}", "--", "npm", "start"]
     build: .
+    volumes:
+      - ./:/usr/app/
     restart: unless-stopped
     env_file: ./.env
     ports:
@@ -27,9 +32,7 @@ services:
       - DB_PORT=$MYSQLDB_DOCKER_PORT
     stdin_open: true
     tty: true
-    volumes:
-      - app:/usr/src/app/
+
 
 volumes:
   db:
-  app:

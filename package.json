@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "sleep 1 && db-migrate up",
+    "migrate": "db-migrate up",
     "build": "tsc",
-    "start": "sleep 10 && node ./dist/index.js",
-    "dev": "npx nodemon src/index.ts"
+    "start": "npm run migrate && npm run build && node ./dist/index.js",
+    "dev": "db-migrate up && npx nodemon src/index.ts"
   },
   "author": "Roman Kosolapov <kosolapov-r@bk.ru>",
   "license": "ISC",
