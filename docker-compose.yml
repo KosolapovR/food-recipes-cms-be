@@ -17,10 +17,9 @@ services:
   app:
     depends_on:
       - mysqldb
-    command: ["./wait-for-it.sh", "mysqldb:${MYSQLDB_DOCKER_PORT}", "-t", "60", "--", "npm", "start"]
     build: .
-    volumes:
-      - ./:/usr/app/
+    command: ["./wait-for-it.sh", "mysqldb:${MYSQLDB_DOCKER_PORT}", "--", "npm", "start"]
+
     restart: unless-stopped
     env_file: ./.env
     ports:
