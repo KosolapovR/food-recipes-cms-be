@@ -8,10 +8,11 @@
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": "./src",
+    "removeComments": false,
     "paths": {
       "*": [
-        "node_modules/*",
-      ],
+        "node_modules/*"
+      ]
     }
   },
   "include": [

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.ts",
+    "migrate": "sleep 1 && db-migrate up",
+    "build": "tsc",
+    "start": "sleep 10 && node ./dist/index.js",
     "dev": "npx nodemon src/index.ts"
   },
   "author": "Roman Kosolapov <kosolapov-r@bk.ru>",
@@ -13,6 +15,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "db-migrate": "^0.11.13",
     "db-migrate-mysql": "^2.2.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

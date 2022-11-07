@@ -6,11 +6,5 @@
     "password": {"ENV": "DB_PASSWORD"},
     "database":  {"ENV": "DB_NAME"},
     "multipleStatements": true
-  },
-
-  "prod": {
-    "driver": "mysql",
-    "user": "root",
-    "password": "root"
   }
 }

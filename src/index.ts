@@ -15,7 +15,7 @@ const cors = require("cors");
 const app = express();
 const expressSwagger = require("express-swagger-generator")(app);
 
-const port = 8163;
+const port = process.env.NODE_DOCKER_PORT || 8080;
 
 let options = {
   swaggerDefinition: {
