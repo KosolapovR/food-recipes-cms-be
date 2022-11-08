@@ -46,7 +46,7 @@ const { infoLog } = require("./utils/logger");
 
 app.use(
   cors({
-    origin: "http://localhost:5000",
+    origin: "*",
   })
 );
 app.use(express.json());
