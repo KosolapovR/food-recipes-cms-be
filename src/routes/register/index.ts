@@ -65,8 +65,9 @@ router.post("/", async function (req: Request, res: Response) {
 
     // return new user
     res.status(201).json(user);
-  } catch (err) {
-    errorLog(err);
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
   }
 });
 

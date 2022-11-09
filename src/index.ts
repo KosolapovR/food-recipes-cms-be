@@ -7,6 +7,7 @@ import {
   uploadRouter,
   commentRouter,
   userRouter,
+  healthcheckRouter,
 } from "./routes";
 
 const express = require("express");
@@ -53,6 +54,7 @@ app.use(express.json());
 app.use("/public", express.static("public"));
 app.use("/auth", authRouter);
 app.use("/comment", commentRouter);
+app.use("/healthcheck", healthcheckRouter);
 app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
 app.use("/upload", uploadRouter);

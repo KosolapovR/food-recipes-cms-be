@@ -109,8 +109,9 @@ router.get("/", async function (req: Request, res: Response) {
     }
 
     res.status(200).send({ data: result });
-  } catch (err) {
-    errorLog(err);
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
   }
 });
 
@@ -136,8 +137,9 @@ router.post("/Delete", async function (req: Request, res: Response) {
     }
 
     res.status(204).send();
-  } catch (err) {
-    errorLog(err);
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
   }
 });
 
@@ -163,8 +165,9 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     }
 
     res.status(204).send();
-  } catch (err) {
-    errorLog(err);
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
   }
 });
 
