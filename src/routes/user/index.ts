@@ -171,14 +171,14 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
 });
 
 /**
- * @route PUT /user/Activate
+ * @route POST /user/Activate
  * @group User - Operations about user
  * @param {number} id.body.required
  * @returns {UserModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.put("/Activate", async function (req: IRequestWithToken, res: Response) {
+router.post("/Activate", async function (req: IRequestWithToken, res: Response) {
   try {
     const { id } = req.body;
 
@@ -215,14 +215,14 @@ router.put("/Activate", async function (req: IRequestWithToken, res: Response) {
 });
 
 /**
- * @route PUT /user/Deactivate
+ * @route POST /user/Deactivate
  * @group User - Operations about user
  * @param {number} id.body.required
  * @returns {UserModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.put("/Activate", async function (req: IRequestWithToken, res: Response) {
+router.post("/Activate", async function (req: IRequestWithToken, res: Response) {
   try {
     const { id } = req.body;
 

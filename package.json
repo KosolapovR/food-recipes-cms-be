@@ -8,15 +8,15 @@
     "migrate": "db-migrate up",
     "build": "tsc",
     "start": "npm run migrate && npm run build && node ./dist/index.js",
-    "dev": "db-migrate up && npx nodemon src/index.ts"
+    "dev": "npm run migrate && npx nodemon src/index.ts"
   },
   "author": "Roman Kosolapov <kosolapov-r@bk.ru>",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "db-migrate": "^0.11.13",
-    "db-migrate-mysql": "^2.2.0",
+    "db-migrate": "0.11.13",
+    "db-migrate-mysql": "2.2.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-validator": "^6.14.2",

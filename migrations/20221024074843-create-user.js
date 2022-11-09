@@ -25,6 +25,7 @@ exports.up = function (db, callback) {
       email: { type: "string", unique: true, notNull: true },
       password: { type: "string", notNull: true },
       isAdmin: { type: "boolean", default: false },
+      status: { type: "string", default: 'inactive' },
     },
     createAdmin
   );
