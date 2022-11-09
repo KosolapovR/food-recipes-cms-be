@@ -34,7 +34,7 @@ exports.up = function (db, callback) {
       return;
     }
     db.runSql(
-      "INSERT INTO users (email, password, isAdmin) values ('admin@mail.ru', '$2y$10$bBA63.sfLmOyG9aqS8aKY.TyRZfFN1HiWaLWJfHZdQVUuQVpsnVQ2', true)",
+      "INSERT INTO users (email, password, isAdmin, status) values ('admin@mail.ru', '$2y$10$bBA63.sfLmOyG9aqS8aKY.TyRZfFN1HiWaLWJfHZdQVUuQVpsnVQ2', true, 'active')",
       callback
     );
   }

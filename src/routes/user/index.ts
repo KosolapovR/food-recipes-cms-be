@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { userRepo } from "../../repository";
 import { errorLog } from "../../utils";
-import bcrypt from "bcryptjs";
+import { IRequestWithToken } from "../../types";
 
 const router = express.Router();
 
@@ -15,13 +17,14 @@ router.use(protectedRoute);
  * @param {number} id.body.required
  * @param {string} email.body.required
  * @param {string} password.body
+ * @param {status} status.body
  * @returns {UserModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.put("/Update", async function (req: Request, res: Response) {
   try {
-    const { id, email, password, isAdmin } = req.body;
+    const { id, email, password, isAdmin, status } = req.body;
 
     if (!email && !password && typeof isAdmin === "undefined") {
       res.status(400).send("All input is required");
@@ -47,6 +50,7 @@ router.put("/Update", async function (req: Request, res: Response) {
       email,
       isAdmin,
       password: encryptedPassword,
+      status,
     });
     if (!user) {
       errorLog("Cannot update user", user);
@@ -160,6 +164,94 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     }
 
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
+  }
+});
+
+/**
+ * @route PUT /user/Activate
+ * @group User - Operations about user
+ * @param {number} id.body.required
+ * @returns {UserModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.put("/Activate", async function (req: IRequestWithToken, res: Response) {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      res.status(400).send("All input is required");
+    }
+
+    const { email } = jwt.decode(req.token) as JwtPayload;
+
+    const [currentUser] = await userRepo.getByField({
+      fieldName: "email",
+      fieldValue: email,
+    });
+
+    if (!currentUser.isAdmin) {
+      return res.status(401).send("Not enough rights for operation");
+    }
+
+    const activatedUser = await userRepo.updateByField({
+      id,
+      fieldName: "status",
+      fieldValue: "active",
+    });
+
+    if (!activatedUser) {
+      res.status(400).send("Cannot activate user");
+    }
+
+    res.status(200).send({ data: activatedUser });
+  } catch (error) {
+    res.status(500).json({ error: error });
+    errorLog(error);
+  }
+});
+
+/**
+ * @route PUT /user/Deactivate
+ * @group User - Operations about user
+ * @param {number} id.body.required
+ * @returns {UserModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.put("/Activate", async function (req: IRequestWithToken, res: Response) {
+  try {
+    const { id } = req.body;
+
+    if (!id) {
+      res.status(400).send("All input is required");
+    }
+
+    const { email } = jwt.decode(req.token) as JwtPayload;
+
+    const [currentUser] = await userRepo.getByField({
+      fieldName: "email",
+      fieldValue: email,
+    });
+
+    if (!currentUser.isAdmin) {
+      return res.status(401).send("Not enough rights for operation");
+    }
+
+    const activatedUser = await userRepo.updateByField({
+      id,
+      fieldName: "status",
+      fieldValue: "inactive",
+    });
+
+    if (!activatedUser) {
+      res.status(400).send("Cannot deactivate user");
+    }
+
+    res.status(200).send({ data: activatedUser });
   } catch (error) {
     res.status(500).json({ error: error });
     errorLog(error);

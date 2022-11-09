@@ -44,6 +44,7 @@ router.post("/", async function (req: Request, res: Response) {
       email,
       password: encryptedPassword,
       isAdmin,
+      status: "inactive",
     });
     if (!result.insertId) {
       errorLog("User not created", result);
