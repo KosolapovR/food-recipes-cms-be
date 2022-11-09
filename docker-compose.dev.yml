@@ -18,7 +18,7 @@ services:
     depends_on:
       - mysqldb
     build: .
-    command: ["./wait-for-it.sh", "mysqldb:${MYSQLDB_DOCKER_PORT}", "--", "npm", "start"]
+    command: ["./wait-for-it.sh", "mysqldb:${MYSQLDB_DOCKER_PORT}", "--", "npm", "run", "dev"]
 
     restart: unless-stopped
     env_file: ./.env
