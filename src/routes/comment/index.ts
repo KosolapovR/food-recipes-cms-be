@@ -29,7 +29,7 @@ router.post(
       const { text, userId, recipeId } = req.body;
 
       if (!(text && userId && recipeId)) {
-        res.status(400).send("All input is required");
+        return res.status(400).send("All input is required");
       }
 
       const comment = await commentRepo.add({
@@ -41,10 +41,10 @@ router.post(
       });
       if (!comment) {
         errorLog("Cannot add comment", comment);
-        res.status(400).send("Cannot add comment");
+        return res.status(400).send("Cannot add comment");
       }
 
-      res.status(201).send({ data: comment });
+      return res.status(201).send({ data: comment });
     } catch (err) {
       errorLog(err);
     }
@@ -70,7 +70,7 @@ router.put(
       const { id, text, userId, recipeId, date, status } = req.body;
 
       if (!(text && userId && recipeId)) {
-        res.status(400).send("All input is required");
+        return res.status(400).send("All input is required");
       }
 
       const comment = await commentRepo.update({
@@ -83,10 +83,10 @@ router.put(
       });
       if (!comment) {
         errorLog("Cannot update comment", comment);
-        res.status(400).send("Cannot update comment");
+        return res.status(400).send("Cannot update comment");
       }
 
-      res.status(200).send({ data: comment });
+      return res.status(200).send({ data: comment });
     } catch (err) {
       errorLog(err);
     }
@@ -105,13 +105,12 @@ router.get("/", async function (req: Request, res: Response) {
     const result = await commentRepo.getAll();
     if (!result) {
       errorLog("Cannot get comments", result);
-      res.status(400).send("Cannot get comments");
+      return res.status(400).send("Cannot get comments");
     }
 
-    res.status(200).send({ data: result });
+    return res.status(200).send({ data: result });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -128,18 +127,17 @@ router.post("/Delete", async function (req: Request, res: Response) {
     const { id } = req.body;
 
     if (!id) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await commentRepo.removeById({ id });
     if (!result) {
-      res.status(400).send("Cannot delete comment");
+      return res.status(400).send("Cannot delete comment");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -156,18 +154,17 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     const { ids } = req.body;
 
     if (!ids || ids.length === 0) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await commentRepo.removeAllByIds({ ids });
     if (!result) {
-      res.status(400).send("Cannot delete comment");
+      return res.status(400).send("Cannot delete comment");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 

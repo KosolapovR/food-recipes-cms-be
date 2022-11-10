@@ -61,10 +61,10 @@ router.post(
       const image = req.file;
 
       if (!image) {
-        res.status(400).send("All input is required");
+        return res.status(400).send("All input is required");
       }
 
-      res.status(201).json({
+      return res.status(201).json({
         message: "image successfully uploaded",
         imagePath: image.path,
       });

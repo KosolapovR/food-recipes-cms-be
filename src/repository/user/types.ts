@@ -1,7 +1,10 @@
+import { UserStatusType } from "../../interfaces/IUser";
+
 export interface ICreateUserParams {
   email: string;
   password: string;
   isAdmin?: boolean;
+  status: UserStatusType;
 }
 
 export interface IUpdateUserParams extends ICreateUserParams {

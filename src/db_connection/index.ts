@@ -1,14 +1,15 @@
-import mysql, { Connection } from "mysql2/promise";
+import mysql, { Pool } from "mysql2/promise";
 
-const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT } = process.env;
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
 
-let db: Promise<Connection> = mysql.createConnection({
+let pool: Pool = mysql.createPool({
   host: DB_HOST,
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
+  enableKeepAlive: true,
 });
 
-const getConnection = (): Promise<Connection> => db;
+const getConnection = (): Pool => pool;
 
 export { getConnection };

@@ -27,7 +27,7 @@ router.post(
       const { title, steps, previewImagePath } = req.body;
 
       if (!(title && steps)) {
-        res.status(400).send("Required fields: title, steps");
+        return res.status(400).send("Required fields: title, steps");
       }
 
       const recipe = await recipeRepo.add({
@@ -38,13 +38,12 @@ router.post(
       });
       if (!recipe) {
         errorLog("Cannot add recipe", recipe);
-        res.status(400).send("Cannot add recipe");
+        return res.status(400).send("Cannot add recipe");
       }
 
-      res.status(201).send({ data: recipe });
+      return res.status(201).send({ data: recipe });
     } catch (error) {
-      res.status(500).json({ error: error });
-      errorLog(error);
+      return res.status(500).json({ error: error });
     }
   }
 );
@@ -68,7 +67,7 @@ router.put(
       const { id, title, steps, status, previewImagePath } = req.body;
 
       if (!(title && steps && status)) {
-        res.status(400).send("All input is required");
+        return res.status(400).send("All input is required");
       }
 
       const recipe = await recipeRepo.update({
@@ -80,13 +79,12 @@ router.put(
       });
       if (!recipe) {
         errorLog("Cannot update recipe", recipe);
-        res.status(400).send("Cannot update recipe");
+        return res.status(400).send("Cannot update recipe");
       }
 
-      res.status(200).send({ data: recipe });
+      return res.status(200).send({ data: recipe });
     } catch (error) {
-      res.status(500).json({ error: error });
-      errorLog(error);
+      return res.status(500).json({ error: error });
     }
   }
 );
@@ -113,13 +111,12 @@ router.get("/", async function (req: Request, res: Response) {
 
     if (!result) {
       errorLog("Cannot get recipes", result);
-      res.status(400).send("Cannot get recipes");
+      return res.status(400).send("Cannot get recipes");
     }
 
-    res.status(200).send({ data: result });
+    return res.status(200).send({ data: result });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -144,10 +141,9 @@ router.get("/:id", async function (req: Request, res: Response) {
       return res.status(400).send("Cannot get recipe");
     }
 
-    res.status(200).send({ data: result });
+    return res.status(200).send({ data: result });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -164,18 +160,17 @@ router.post("/Delete", async function (req: Request, res: Response) {
     const { id } = req.body;
 
     if (!id) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await recipeRepo.removeById({ id });
     if (!result) {
-      res.status(400).send("Cannot delete recipe");
+      return res.status(400).send("Cannot delete recipe");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -192,18 +187,17 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     const { ids } = req.body;
 
     if (!ids || ids.length === 0) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await recipeRepo.removeAllByIds({ ids });
     if (!result) {
-      res.status(400).send("Cannot delete recipes");
+      return res.status(400).send("Cannot delete recipes");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 

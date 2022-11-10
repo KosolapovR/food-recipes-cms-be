@@ -33,28 +33,47 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   return rows;
 };
 
-const add = async ({ email, password, isAdmin }: ICreateUserParams) => {
+const add = async ({ email, password, isAdmin, status }: ICreateUserParams) => {
   const db = await getConnection();
   const [rows] = await db.query<ResultSetHeader>(
-    `INSERT INTO users (email, password, isAdmin) values (?, ?, ?)`,
-    [email, password, isAdmin]
+    `INSERT INTO users (email, password, isAdmin, status) values (?, ?, ?, ?)`,
+    [email, password, isAdmin, status]
   );
   return rows;
 };
 
-const update = async ({ id, email, password, isAdmin }: IUpdateUserParams) => {
+const update = async ({
+  id,
+  email,
+  password,
+  isAdmin,
+  status,
+}: IUpdateUserParams) => {
   const db = await getConnection();
   if (password) {
     await db.query<ResultSetHeader>(
-      `UPDATE users SET email=?, password=?, isAdmin=? WHERE id=?`,
-      [email, password, isAdmin, id]
+      `UPDATE users SET email=?, password=?, isAdmin=?, status=? WHERE id=?`,
+      [email, password, isAdmin, status, id]
     );
   } else {
     await db.query<ResultSetHeader>(
-      `UPDATE users SET email=?, isAdmin=? WHERE id=?`,
-      [email, isAdmin, id]
+      `UPDATE users SET email=?, isAdmin=?, status=? WHERE id=?`,
+      [email, isAdmin, status, id]
     );
   }
+  return await getById(id);
+};
+
+const updateByField = async ({
+  fieldName,
+  fieldValue,
+  id,
+}: IFieldNameValue & { id: number }) => {
+  const db = await getConnection();
+  await db.query<ResultSetHeader>(
+    `UPDATE users SET ${fieldName}=? WHERE id=?`,
+    [fieldValue, id]
+  );
   return await getById(id);
 };
 
@@ -80,4 +99,13 @@ const removeAllByIds = async ({ ids }: IBatchDeleteUserParams) => {
   return deletedCount > 0;
 };
 
-export { getById, getAll, getByField, add, update, removeById, removeAllByIds };
+export {
+  getById,
+  getAll,
+  getByField,
+  add,
+  update,
+  updateByField,
+  removeById,
+  removeAllByIds,
+};

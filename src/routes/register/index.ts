@@ -23,7 +23,7 @@ router.post("/", async function (req: Request, res: Response) {
     const { email, password, isAdmin } = req.body;
 
     if (!(email && password)) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const [oldUser] = await userRepo.getByField({
@@ -44,6 +44,7 @@ router.post("/", async function (req: Request, res: Response) {
       email,
       password: encryptedPassword,
       isAdmin,
+      status: "inactive",
     });
     if (!result.insertId) {
       errorLog("User not created", result);
@@ -64,10 +65,9 @@ router.post("/", async function (req: Request, res: Response) {
     const user = { id: result.insertId, email, token };
 
     // return new user
-    res.status(201).json(user);
+    return res.status(201).json(user);
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 

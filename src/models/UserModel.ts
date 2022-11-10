@@ -4,6 +4,7 @@ import { IUser } from "../interfaces";
  * @property {string} id.required
  * @property {string} email
  * @property {string} token
+ * @property {string} status
  */
 export interface UserModel {
   model: IUser;
