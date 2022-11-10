@@ -7,15 +7,8 @@ let pool: Pool = mysql.createPool({
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
+  enableKeepAlive: true,
 });
-
-async function keepAlive() {
-  const { ping, release } = await pool.getConnection();
-  await ping();
-  release();
-}
-
-setInterval(keepAlive, 60000); // ping to DB every minute
 
 const getConnection = (): Pool => pool;
 

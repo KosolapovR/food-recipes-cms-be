@@ -27,7 +27,7 @@ router.put("/Update", async function (req: Request, res: Response) {
     const { id, email, password, isAdmin, status } = req.body;
 
     if (!email && !password && typeof isAdmin === "undefined") {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const [oldUser] = await userRepo.getByField({
@@ -54,13 +54,12 @@ router.put("/Update", async function (req: Request, res: Response) {
     });
     if (!user) {
       errorLog("Cannot update user", user);
-      res.status(400).send("Cannot update user");
+      return res.status(400).send("Cannot update user");
     }
 
-    res.status(200).send({ data: user });
+    return res.status(200).send({ data: user });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -76,13 +75,12 @@ router.get("/", async function (req: Request, res: Response) {
     const result = await userRepo.getAll();
     if (!result) {
       errorLog("Cannot get users", result);
-      res.status(400).send("Cannot get users");
+      return res.status(400).send("Cannot get users");
     }
 
-    res.status(200).send({ data: result });
+    return res.status(200).send({ data: result });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -98,19 +96,16 @@ router.get("/:id", async function (req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id);
     if (!id || Number.isNaN(id)) {
-      errorLog("Cannot get user by id", req.params.id);
-      res.status(400).send(`Cannot get user by id ${req.params.id}`);
+      return res.status(400).send(`Cannot get user by id ${req.params.id}`);
     }
     const result = await userRepo.getById(id);
     if (!result) {
-      errorLog("Cannot get user", result);
-      res.status(400).send("Cannot get user");
+      return res.status(400).send("Cannot get user");
     }
 
-    res.status(200).send({ data: result });
+    return res.status(200).send({ data: result });
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -127,18 +122,17 @@ router.post("/Delete", async function (req: Request, res: Response) {
     const { id } = req.body;
 
     if (!id) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await userRepo.removeById({ id });
     if (!result) {
-      res.status(400).send("Cannot delete user");
+      return res.status(400).send("Cannot delete user");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -155,18 +149,17 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     const { ids } = req.body;
 
     if (!ids || ids.length === 0) {
-      res.status(400).send("All input is required");
+      return res.status(400).send("All input is required");
     }
 
     const result = await userRepo.removeAllByIds({ ids });
     if (!result) {
-      res.status(400).send("Cannot delete users");
+      return res.status(400).send("Cannot delete users");
     }
 
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
+    return res.status(500).json({ error: error });
   }
 });
 
@@ -178,41 +171,43 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.post("/Activate", async function (req: IRequestWithToken, res: Response) {
-  try {
-    const { id } = req.body;
+router.post(
+  "/Activate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
 
-    if (!id) {
-      res.status(400).send("All input is required");
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const activatedUser = await userRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "active",
+      });
+
+      if (!activatedUser) {
+        return res.status(400).send("Cannot activate user");
+      }
+
+      return res.status(200).send({ data: activatedUser });
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const { email } = jwt.decode(req.token) as JwtPayload;
-
-    const [currentUser] = await userRepo.getByField({
-      fieldName: "email",
-      fieldValue: email,
-    });
-
-    if (!currentUser.isAdmin) {
-      return res.status(401).send("Not enough rights for operation");
-    }
-
-    const activatedUser = await userRepo.updateByField({
-      id,
-      fieldName: "status",
-      fieldValue: "active",
-    });
-
-    if (!activatedUser) {
-      res.status(400).send("Cannot activate user");
-    }
-
-    res.status(200).send({ data: activatedUser });
-  } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
   }
-});
+);
 
 /**
  * @route POST /user/Deactivate
@@ -222,40 +217,42 @@ router.post("/Activate", async function (req: IRequestWithToken, res: Response) 
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.post("/Activate", async function (req: IRequestWithToken, res: Response) {
-  try {
-    const { id } = req.body;
+router.post(
+  "/Deactivate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
 
-    if (!id) {
-      res.status(400).send("All input is required");
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const activatedUser = await userRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "inactive",
+      });
+
+      if (!activatedUser) {
+        return res.status(400).send("Cannot deactivate user");
+      }
+
+      return res.status(200).send({ data: activatedUser });
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const { email } = jwt.decode(req.token) as JwtPayload;
-
-    const [currentUser] = await userRepo.getByField({
-      fieldName: "email",
-      fieldValue: email,
-    });
-
-    if (!currentUser.isAdmin) {
-      return res.status(401).send("Not enough rights for operation");
-    }
-
-    const activatedUser = await userRepo.updateByField({
-      id,
-      fieldName: "status",
-      fieldValue: "inactive",
-    });
-
-    if (!activatedUser) {
-      res.status(400).send("Cannot deactivate user");
-    }
-
-    res.status(200).send({ data: activatedUser });
-  } catch (error) {
-    res.status(500).json({ error: error });
-    errorLog(error);
   }
-});
+);
 
 export { router as userRouter };

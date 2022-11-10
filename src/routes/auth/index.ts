@@ -27,7 +27,7 @@ router.post(
       const { email, password } = req.body;
 
       if (!(email && password)) {
-        res.status(400).send("All input is required");
+        return res.status(400).send("All input is required");
       }
 
       const [user]: IUser[] = await userRepo.getByField({
@@ -61,12 +61,11 @@ router.post(
 
           warningLog(`user ${user.email} was authorized`);
           // return authorized user
-          res.status(201).json(user);
+          return res.status(201).json(user);
         }
       );
     } catch (error) {
-      res.status(500).json({ error: error });
-      errorLog(error);
+      return res.status(500).json({ error: error });
     }
   }
 );
