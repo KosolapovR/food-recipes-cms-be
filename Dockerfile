@@ -1,6 +1,6 @@
 FROM --platform=linux/x86_64 node:16-alpine
 
-WORKDIR /usr/app
+WORKDIR /usr/server
 COPY package.json .
 
 RUN rm -rf ./node_modules
@@ -11,7 +11,7 @@ RUN apk --no-cache add curl
 
 RUN npm install
 
-COPY . /usr/app
+COPY . /usr/server
 
 HEALTHCHECK --interval=12s --timeout=12s --start-period=15s \
     CMD curl --fail http://localhost:8080/healthcheck || exit 1
