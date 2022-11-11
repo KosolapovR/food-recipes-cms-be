@@ -13,7 +13,5 @@ RUN npm install
 
 COPY . /usr/app
 
-RUN ["chmod", "+x", "/usr/app/wait-for-it.sh"]
-
 HEALTHCHECK --interval=12s --timeout=12s --start-period=15s \
     CMD curl --fail http://localhost:8080/healthcheck || exit 1
