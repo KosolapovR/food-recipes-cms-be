@@ -2,8 +2,10 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { commentRepo } from "../../repository";
+import { commentRepo, userRepo } from "../../repository";
 import { errorLog } from "../../utils";
+import { IRequestWithToken } from "../../types";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -37,7 +39,7 @@ router.post(
         userId,
         recipeId,
         date: new Date(),
-        status: "hidden",
+        status: "inactive",
       });
       if (!comment) {
         errorLog("Cannot add comment", comment);
@@ -167,5 +169,97 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     return res.status(500).json({ error: error });
   }
 });
+
+/**
+ * @route POST /comment/Activate
+ * @group Comment - Operations about comment
+ * @param {number} id.body.required
+ * @returns {CommentModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.post(
+  "/Activate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
+
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const activatedComment = await commentRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "active",
+      });
+
+      if (!activatedComment) {
+        return res.status(400).send("Cannot activate comment");
+      }
+
+      return res.status(200).send({ data: activatedComment });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
+  }
+);
+
+/**
+ * @route POST /comment/Deactivate
+ * @group Comment - Operations about comment
+ * @param {number} id.body.required
+ * @returns {CommentModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.post(
+  "/Deactivate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
+
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const deactivatedComment = await userRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "inactive",
+      });
+
+      if (!deactivatedComment) {
+        return res.status(400).send("Cannot deactivate comment");
+      }
+
+      return res.status(200).send({ data: deactivatedComment });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
+  }
+);
 
 export { router as commentRouter };

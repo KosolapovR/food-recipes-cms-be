@@ -71,6 +71,19 @@ const update = async ({
   return await getById(id);
 };
 
+const updateByField = async ({
+  fieldName,
+  fieldValue,
+  id,
+}: IFieldNameValue & { id: number }) => {
+  const db = await getConnection();
+  await db.query<ResultSetHeader>(
+    `UPDATE comments SET ${fieldName}=? WHERE id=?`,
+    [fieldValue, id]
+  );
+  return await getById(id);
+};
+
 const removeById = async ({ id }: IDeleteCommentParams) => {
   const db = await getConnection();
 
@@ -95,4 +108,13 @@ const removeAllByIds = async ({ ids }: IBatchDeleteCommentParams) => {
   return deletedCount > 0;
 };
 
-export { getById, getAll, getByField, add, update, removeById, removeAllByIds };
+export {
+  getById,
+  getAll,
+  getByField,
+  add,
+  update,
+  updateByField,
+  removeById,
+  removeAllByIds,
+};

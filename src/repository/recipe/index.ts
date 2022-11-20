@@ -120,6 +120,19 @@ const update = async ({
   return await getById(id);
 };
 
+const updateByField = async ({
+  fieldName,
+  fieldValue,
+  id,
+}: IFieldNameValue & { id: number }) => {
+  const db = await getConnection();
+  await db.query<ResultSetHeader>(
+    `UPDATE recipes SET ${fieldName}=? WHERE id=?`,
+    [fieldValue, id]
+  );
+  return await getById(id);
+};
+
 const removeById = async ({ id }: IDeleteRecipeParams) => {
   const db = await getConnection();
 
@@ -144,4 +157,13 @@ const removeAllByIds = async ({ ids }: IBatchDeleteRecipeParams) => {
   return deletedCount > 0;
 };
 
-export { getById, getAll, getByField, add, update, removeById, removeAllByIds };
+export {
+  getById,
+  getAll,
+  getByField,
+  add,
+  update,
+  updateByField,
+  removeById,
+  removeAllByIds,
+};

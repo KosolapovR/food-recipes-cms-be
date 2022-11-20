@@ -1,6 +1,6 @@
 import { RowDataPacket } from "mysql2";
 
-export type CommentStatusType = "hidden" | "published" | "archive";
+export type CommentStatusType = "active" | "inactive";
 
 export interface IComment extends RowDataPacket {
   id: string;

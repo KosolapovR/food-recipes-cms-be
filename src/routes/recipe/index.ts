@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { recipeRepo } from "../../repository";
+import { recipeRepo, userRepo } from "../../repository";
 import { errorLog } from "../../utils";
+import { IRequestWithToken } from "../../types";
 
 const router = express.Router();
 
@@ -200,5 +202,97 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
     return res.status(500).json({ error: error });
   }
 });
+
+/**
+ * @route POST /recipe/Activate
+ * @group Recipe - Operations about recipe
+ * @param {number} id.body.required
+ * @returns {RecipeModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.post(
+  "/Activate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
+
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const activatedRecipe = await recipeRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "active",
+      });
+
+      if (!activatedRecipe) {
+        return res.status(400).send("Cannot activate recipe");
+      }
+
+      return res.status(200).send({ data: activatedRecipe });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
+  }
+);
+
+/**
+ * @route POST /recipe/Deactivate
+ * @group Recipe - Operations about recipe
+ * @param {number} id.body.required
+ * @returns {RecipeModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  403 - Wrong credentials
+ */
+router.post(
+  "/Deactivate",
+  async function (req: IRequestWithToken, res: Response) {
+    try {
+      const { id } = req.body;
+
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
+      }
+
+      const deactivatedRecipe = await recipeRepo.updateByField({
+        id,
+        fieldName: "status",
+        fieldValue: "inactive",
+      });
+
+      if (!deactivatedRecipe) {
+        return res.status(400).send("Cannot deactivate recipe");
+      }
+
+      return res.status(200).send({ data: deactivatedRecipe });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
+  }
+);
 
 export { router as recipeRouter };

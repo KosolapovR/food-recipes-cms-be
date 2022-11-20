@@ -14,14 +14,14 @@ export const protectedRoute = (
     const [, token] = header.split(" ");
     req.token = token;
   } else {
-    res.sendStatus(403);
+    return res.sendStatus(403);
   }
   jwt.verify(
     req.token,
     process.env.TOKEN_KEY,
     (err: JsonWebTokenError, payload: IRequestWithToken) => {
       if (err) {
-        res.sendStatus(403);
+        return res.sendStatus(403);
       } else {
         req.user_id = payload.user_id;
         next();

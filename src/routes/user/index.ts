@@ -238,17 +238,17 @@ router.post(
         return res.status(401).send("Not enough rights for operation");
       }
 
-      const activatedUser = await userRepo.updateByField({
+      const deactivatedUser = await userRepo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "inactive",
       });
 
-      if (!activatedUser) {
+      if (!deactivatedUser) {
         return res.status(400).send("Cannot deactivate user");
       }
 
-      return res.status(200).send({ data: activatedUser });
+      return res.status(200).send({ data: deactivatedUser });
     } catch (error) {
       return res.status(500).json({ error: error });
     }
