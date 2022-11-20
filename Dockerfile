@@ -6,8 +6,7 @@ COPY package.json .
 RUN rm -rf ./node_modules
 RUN rm -rf ./package-lock.json
 
-RUN apk update && apk add bash
-RUN apk --no-cache add curl
+RUN apk update && apk --no-cache add bash curl coreutils
 
 RUN npm install
 
