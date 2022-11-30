@@ -1,5 +1,5 @@
 import { RowDataPacket } from "mysql2";
-import { Interface } from "../interfaces";
+import { IComment } from "../Comment/interface";
 
 export interface IRecipeStep extends RowDataPacket {
   id: number;
@@ -14,7 +14,7 @@ export interface IRecipe extends RowDataPacket {
   id: number;
   title: string;
   steps: IRecipeStep[];
-  comments: Interface[];
+  comments: IComment[];
   status: RecipeStatusType;
   previewImagePath: string;
 }

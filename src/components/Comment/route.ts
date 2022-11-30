@@ -6,6 +6,8 @@ import { IRequestWithToken } from "../../types";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { commentRepo } from "./repo";
 import { userRepo } from "../User/repo";
+import { IComment } from "./interface";
+import { ICreateCommentParams } from "./repo/types";
 
 const router = express.Router();
 
@@ -26,11 +28,14 @@ router.post(
   body("text").not().isEmpty().trim(),
   body("userId").not().isEmpty().trim(),
   body("recipeId").not().isEmpty().trim(),
-  async function (req: Request, res: Response) {
+  async function (
+    req: Request<{}, IComment, Partial<ICreateCommentParams>>,
+    res: Response
+  ) {
     try {
       const { text, userId, recipeId } = req.body;
 
-      if (!(text && userId && recipeId)) {
+      if (!text || !userId || !recipeId) {
         return res.status(400).send("All input is required");
       }
 
@@ -181,7 +186,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 
@@ -227,7 +232,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 

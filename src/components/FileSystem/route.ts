@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { uuid } from "uuidv4";
-import multer, { Multer } from "multer";
+import multer from "multer";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 
@@ -55,7 +55,7 @@ router.use(protectedRoute);
 router.post(
   "/",
   upload.single("image"),
-  async function (req: Request & Multer, res: Response) {
+  async function (req: Request, res: Response) {
     try {
       const image = req.file;
 

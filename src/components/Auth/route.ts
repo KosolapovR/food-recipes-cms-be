@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
@@ -36,22 +36,19 @@ router.post(
         return res.status(404).send();
       }
 
+      const secret: Secret = process.env.TOKEN_KEY || "";
       bcrypt.compare(
         password,
-        user.password,
+        user.password || "",
         (err: Error, isValid: boolean) => {
           if (err || !isValid) {
             return res.status(404).send("Wrong credentials");
           }
 
           // save user token
-          user.token = jwt.sign(
-            { user_id: user.id, email },
-            process.env.TOKEN_KEY,
-            {
-              expiresIn: "2h",
-            }
-          );
+          user.token = jwt.sign({ user_id: user.id, email }, secret, {
+            expiresIn: "2h",
+          });
 
           // return authorized user
           return res.status(201).json(user);

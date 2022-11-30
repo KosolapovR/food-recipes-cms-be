@@ -2,7 +2,7 @@ import { UserStatusType } from "../interface";
 
 export interface ICreateUserParams {
   email: string;
-  password: string;
+  password?: string;
   isAdmin?: boolean;
   status: UserStatusType;
 }

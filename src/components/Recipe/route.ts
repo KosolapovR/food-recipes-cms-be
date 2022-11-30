@@ -211,7 +211,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 
@@ -257,7 +257,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 

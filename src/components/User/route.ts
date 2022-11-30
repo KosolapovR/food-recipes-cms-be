@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { IRequestWithToken } from "../../types";
 import { userRepo } from "./repo";
+import { IUser } from "./interface";
+import { IUpdateUserParams } from "./repo/types";
 
 const router = express.Router();
 
@@ -21,45 +23,48 @@ router.use(protectedRoute);
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.put("/Update", async function (req: Request, res: Response) {
-  try {
-    const { id, email, password, isAdmin, status } = req.body;
+router.put(
+  "/Update",
+  async function (req: Request<{}, IUser, IUpdateUserParams>, res: Response) {
+    try {
+      const { id, email, password, isAdmin, status } = req.body;
 
-    if (!email && !password && typeof isAdmin === "undefined") {
-      return res.status(400).send("All input is required");
+      if (!email && !password && typeof isAdmin === "undefined") {
+        return res.status(400).send("All input is required");
+      }
+
+      const [oldUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (oldUser) {
+        return res.status(409).send("User with same email already exist");
+      }
+
+      //Encrypt user password
+      let encryptedPassword;
+      if (password) {
+        encryptedPassword = (await bcrypt.hash(password, 10)) as string;
+      }
+
+      const user = await userRepo.update({
+        id,
+        email,
+        isAdmin,
+        password: encryptedPassword,
+        status,
+      });
+      if (!user) {
+        return res.status(400).send("Cannot update user");
+      }
+
+      return res.status(200).send({ data: user });
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const [oldUser] = await userRepo.getByField({
-      fieldName: "email",
-      fieldValue: email,
-    });
-
-    if (oldUser) {
-      return res.status(409).send("User with same email already exist");
-    }
-
-    //Encrypt user password
-    let encryptedPassword;
-    if (password) {
-      encryptedPassword = await bcrypt.hash(password, 10);
-    }
-
-    const user = await userRepo.update({
-      id,
-      email,
-      isAdmin,
-      password: encryptedPassword,
-      status,
-    });
-    if (!user) {
-      return res.status(400).send("Cannot update user");
-    }
-
-    return res.status(200).send({ data: user });
-  } catch (error) {
-    return res.status(500).json({ error: error });
   }
-});
+);
 
 /**
  * @route GET /user
@@ -174,7 +179,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 
@@ -220,7 +225,7 @@ router.post(
     try {
       const { id } = req.body;
 
-      if (!id) {
+      if (!id || !req.token) {
         return res.status(400).send("All input is required");
       }
 

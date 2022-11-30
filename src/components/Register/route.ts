@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { Secret } from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { ResultSetHeader } from "mysql2/promise";
 import { userRepo } from "../User/repo";
@@ -47,14 +47,11 @@ router.post("/", async function (req: Request, res: Response) {
       return res.status(400).send("User not created");
     }
 
+    const secret: Secret = process.env.TOKEN_KEY || "";
     // Create token
-    const token = jwt.sign(
-      { user_id: result.insertId, email },
-      process.env.TOKEN_KEY,
-      {
-        expiresIn: "2h",
-      }
-    );
+    const token = jwt.sign({ user_id: result.insertId, email }, secret, {
+      expiresIn: "2h",
+    });
     // save user token
     const user = { id: result.insertId, email, token };
 
