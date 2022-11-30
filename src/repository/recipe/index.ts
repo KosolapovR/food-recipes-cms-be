@@ -112,10 +112,17 @@ const update = async ({
   );
 
   for (let i = 0; i < steps.length; i++) {
-    await db.query<ResultSetHeader>(
-      `UPDATE recipe_steps SET title=?, text=?, imagePath=? WHERE id=?`,
-      [steps[i].title, steps[i].text, steps[i].imagePath, steps[i].id]
-    );
+    if (steps[i].recipeId) {
+      await db.query<ResultSetHeader>(
+        `UPDATE recipe_steps SET title=?, text=?, imagePath=? WHERE id=?`,
+        [steps[i].title, steps[i].text, steps[i].imagePath, steps[i].id]
+      );
+    } else {
+      await db.query<ResultSetHeader>(
+        `INSERT INTO recipe_steps (recipeId, title, text, imagePath) values (?, ?, ?, ?)`,
+        [id, steps[i].title, steps[i].text, steps[i].imagePath]
+      );
+    }
   }
   return await getById(id);
 };

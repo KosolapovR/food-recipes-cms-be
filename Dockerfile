@@ -12,5 +12,5 @@ RUN npm install
 
 COPY . /usr/server
 
-HEALTHCHECK --interval=12s --timeout=12s --start-period=15s \
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s \
     CMD curl --fail http://localhost:8080/healthcheck || exit 1
