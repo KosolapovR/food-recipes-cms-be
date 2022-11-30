@@ -13,8 +13,6 @@ RUN npm install
 RUN npm run postinstall
 
 COPY . /usr/server
-#RUN npm run migrate
+
 HEALTHCHECK --interval=30s --timeout=30s --start-period=60s \
     CMD curl --fail http://localhost:8080/healthcheck || exit 1
-
-CMD pm2-runtime ./src/index.ts
