@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import createPino from "pino-http";
+const pino = createPino({ transport: { target: "pino-pretty" } });
+
 //@ts-ignore
 import swaggerGenerator from "express-swagger-generator";
 
@@ -13,7 +16,6 @@ import {
   userRouter,
   healthcheckRouter,
 } from "./routes";
-import { infoLog } from "./utils";
 
 import express from "express";
 import cors from "cors";
@@ -48,6 +50,7 @@ const options = {
 };
 expressSwagger(options);
 
+app.use(pino);
 app.use(
   cors({
     origin: "*",
@@ -64,5 +67,5 @@ app.use("/upload", uploadRouter);
 app.use("/user", userRouter);
 
 app.listen(port, () => {
-  infoLog(`Server started on ${port} port`);
+  pino.logger.info(`Server started on ${port} port`);
 });

@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { ResultSetHeader } from "mysql2/promise";
 
-import { errorLog, warningLog } from "../../utils";
 import { userRepo } from "../../repository";
 
 const router = express.Router();
@@ -46,11 +45,8 @@ router.post("/", async function (req: Request, res: Response) {
       status: "inactive",
     });
     if (!result.insertId) {
-      errorLog("User not created", result);
       return res.status(400).send("User not created");
     }
-
-    warningLog("created user ", email);
 
     // Create token
     const token = jwt.sign(

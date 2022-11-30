@@ -4,7 +4,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { recipeRepo, userRepo } from "../../repository";
-import { errorLog } from "../../utils";
 import { IRequestWithToken } from "../../types";
 
 const router = express.Router();
@@ -39,7 +38,6 @@ router.post(
         status: "inactive",
       });
       if (!recipe) {
-        errorLog("Cannot add recipe", recipe);
         return res.status(400).send("Cannot add recipe");
       }
 
@@ -80,7 +78,6 @@ router.put(
         status,
       });
       if (!recipe) {
-        errorLog("Cannot update recipe", recipe);
         return res.status(400).send("Cannot update recipe");
       }
 
@@ -112,10 +109,8 @@ router.get("/", async function (req: Request, res: Response) {
     }
 
     if (!result) {
-      errorLog("Cannot get recipes", result);
       return res.status(400).send("Cannot get recipes");
     }
-
     return res.status(200).send({ data: result });
   } catch (error) {
     return res.status(500).json({ error: error });
@@ -134,12 +129,10 @@ router.get("/:id", async function (req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id);
     if (!id || Number.isNaN(id)) {
-      errorLog("Cannot get recipe by id", req.params.id);
       return res.status(400).send(`Cannot get recipe by id ${req.params.id}`);
     }
     const result = await recipeRepo.getById(id);
     if (!result) {
-      errorLog("Cannot get recipe", result);
       return res.status(400).send("Cannot get recipe");
     }
 

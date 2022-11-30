@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { userRepo } from "../../repository";
-import { errorLog } from "../../utils";
 import { IRequestWithToken } from "../../types";
 
 const router = express.Router();
@@ -53,7 +52,6 @@ router.put("/Update", async function (req: Request, res: Response) {
       status,
     });
     if (!user) {
-      errorLog("Cannot update user", user);
       return res.status(400).send("Cannot update user");
     }
 
@@ -74,7 +72,6 @@ router.get("/", async function (req: Request, res: Response) {
   try {
     const result = await userRepo.getAll();
     if (!result) {
-      errorLog("Cannot get users", result);
       return res.status(400).send("Cannot get users");
     }
 

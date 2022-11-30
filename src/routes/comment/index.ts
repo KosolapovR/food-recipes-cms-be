@@ -3,7 +3,6 @@ import { body } from "express-validator";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { commentRepo, userRepo } from "../../repository";
-import { errorLog } from "../../utils";
 import { IRequestWithToken } from "../../types";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
@@ -42,13 +41,12 @@ router.post(
         status: "inactive",
       });
       if (!comment) {
-        errorLog("Cannot add comment", comment);
         return res.status(400).send("Cannot add comment");
       }
 
       return res.status(201).send({ data: comment });
-    } catch (err) {
-      errorLog(err);
+    } catch (error) {
+      return res.status(500).json({ error });
     }
   }
 );
@@ -84,13 +82,12 @@ router.put(
         status,
       });
       if (!comment) {
-        errorLog("Cannot update comment", comment);
         return res.status(400).send("Cannot update comment");
       }
 
       return res.status(200).send({ data: comment });
-    } catch (err) {
-      errorLog(err);
+    } catch (error) {
+      return res.status(500).json({ error });
     }
   }
 );
@@ -106,13 +103,12 @@ router.get("/", async function (req: Request, res: Response) {
   try {
     const result = await commentRepo.getAll();
     if (!result) {
-      errorLog("Cannot get comments", result);
       return res.status(400).send("Cannot get comments");
     }
 
     return res.status(200).send({ data: result });
   } catch (error) {
-    return res.status(500).json({ error: error });
+    return res.status(500).json({ error });
   }
 });
 

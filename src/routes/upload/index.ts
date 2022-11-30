@@ -3,7 +3,6 @@ import { uuid } from "uuidv4";
 import multer, { Multer } from "multer";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { errorLog } from "../../utils";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -68,8 +67,8 @@ router.post(
         message: "image successfully uploaded",
         imagePath: image.path,
       });
-    } catch (err) {
-      errorLog(err);
+    } catch (error) {
+      return res.status(500).json({ error });
     }
   }
 );

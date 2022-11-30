@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { errorLog, warningLog } from "../../utils";
 import { IUser } from "../../interfaces";
 import { userRepo } from "../../repository";
 
@@ -42,11 +41,7 @@ router.post(
         password,
         user.password,
         (err: Error, isValid: boolean) => {
-          if (err) {
-            errorLog(err);
-          }
-
-          if (!isValid) {
+          if (err || !isValid) {
             return res.status(404).send("Wrong credentials");
           }
 
@@ -59,7 +54,6 @@ router.post(
             }
           );
 
-          warningLog(`user ${user.email} was authorized`);
           // return authorized user
           return res.status(201).json(user);
         }
