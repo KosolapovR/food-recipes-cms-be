@@ -1,4 +1,8 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+
+//@ts-ignore
+import swaggerGenerator from "express-swagger-generator";
 
 import {
   authRouter,
@@ -9,16 +13,17 @@ import {
   userRouter,
   healthcheckRouter,
 } from "./routes";
+import { infoLog } from "./utils";
 
-const express = require("express");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
 
 const app = express();
-const expressSwagger = require("express-swagger-generator")(app);
+const expressSwagger = swaggerGenerator(app);
 
 const port = process.env.NODE_DOCKER_PORT || 8080;
 
-let options = {
+const options = {
   swaggerDefinition: {
     info: {
       title: "Swagger cms-be",
@@ -42,8 +47,6 @@ let options = {
   files: ["./routes/**/*.ts", "./models/*.ts"], //Path to the API handle folder
 };
 expressSwagger(options);
-
-const { infoLog } = require("./utils/logger");
 
 app.use(
   cors({

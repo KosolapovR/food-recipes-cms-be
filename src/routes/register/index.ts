@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { ResultSetHeader } from "mysql2/promise";
 
-import { UserModel } from "../../models/UserModel";
 import { errorLog, warningLog } from "../../utils";
 import { userRepo } from "../../repository";
 

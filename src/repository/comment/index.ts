@@ -97,10 +97,10 @@ const removeById = async ({ id }: IDeleteCommentParams) => {
 const removeAllByIds = async ({ ids }: IBatchDeleteCommentParams) => {
   const db = await getConnection();
   let deletedCount = 0;
-  for (let i = 0; i < ids.length; i++) {
+  for (const id of ids) {
     const [result] = await db.query<ResultSetHeader>(
       `DELETE FROM comments WHERE id=?`,
-      [ids[i]]
+      [id]
     );
     if (result.affectedRows === 1) deletedCount++;
   }

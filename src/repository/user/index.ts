@@ -89,9 +89,10 @@ const removeById = async ({ id }: IDeleteUserParams) => {
 const removeAllByIds = async ({ ids }: IBatchDeleteUserParams) => {
   const db = await getConnection();
   let deletedCount = 0;
-  for (let i = 0; i < ids.length; i++) {
+  for (const id of ids) {
     const [result] = await db.query<ResultSetHeader>(
-      `DELETE FROM users WHERE id=${ids[i]}`
+      `DELETE FROM users WHERE id=?`,
+      [id]
     );
     if (result.affectedRows === 1) deletedCount++;
   }

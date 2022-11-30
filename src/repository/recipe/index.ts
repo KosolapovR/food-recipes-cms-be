@@ -1,14 +1,15 @@
 import { ResultSetHeader } from "mysql2/promise";
+
 import { IRecipe, IRecipeStep } from "../../interfaces";
 import { getConnection } from "../../db_connection";
 import { IFieldNameValue } from "../types";
+import { commentRepo } from "../index";
 import {
   IBatchDeleteRecipeParams,
   ICreateRecipeParams,
   IDeleteRecipeParams,
   IUpdateRecipeParams,
 } from "./types";
-import { commentRepo } from "../index";
 
 const getById = async (id: number) => {
   const db = await getConnection();
@@ -37,18 +38,17 @@ const getById = async (id: number) => {
 const getAll = async () => {
   const db = await getConnection();
   const [recipes] = await db.query<IRecipe[]>("SELECT * FROM recipes");
-  for (let i = 0; i < recipes.length; i++) {
+  for (const recipe of recipes) {
     const [steps] = await db.query<IRecipeStep[]>(
       `SELECT * FROM recipe_steps WHERE recipeId=?`,
-      [recipes[i].id]
+      [recipe.id]
     );
     const comments = await commentRepo.getByField({
       fieldName: "recipeId",
-      fieldValue: recipes[i].id,
+      fieldValue: recipe.id,
     });
-
-    recipes[i].steps = steps;
-    recipes[i].comments = comments;
+    recipe.steps = steps;
+    recipe.comments = comments;
   }
   return recipes;
 };
@@ -60,18 +60,18 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
     [fieldValue]
   );
 
-  for (let i = 0; i < recipes.length; i++) {
+  for (const recipe of recipes) {
     const [steps] = await db.query<IRecipeStep[]>(
       `SELECT * FROM recipe_steps WHERE recipeId=?`,
-      [recipes[i].id]
+      [recipe.id]
     );
     const comments = await commentRepo.getByField({
       fieldName: "recipeId",
-      fieldValue: recipes[i].id,
+      fieldValue: recipe.id,
     });
 
-    recipes[i].steps = steps;
-    recipes[i].comments = comments;
+    recipe.steps = steps;
+    recipe.comments = comments;
   }
   return recipes;
 };
@@ -88,12 +88,13 @@ const add = async ({
     `INSERT INTO recipes (title, previewImagePath, status) values (?, ?, ?)`,
     [title, previewImagePath, status]
   );
-  for (let i = 0; i < steps.length; i++) {
+  for (const { title, text, imagePath } of steps) {
     await db.query<ResultSetHeader>(
       `INSERT INTO recipe_steps (recipeId, title, text, imagePath) values (?, ?, ?, ?)`,
-      [result.insertId, steps[i].title, steps[i].text, steps[i].imagePath]
+      [result.insertId, title, text, imagePath]
     );
   }
+
   return await getById(result.insertId);
 };
 
@@ -111,16 +112,16 @@ const update = async ({
     [title, previewImagePath, status, id]
   );
 
-  for (let i = 0; i < steps.length; i++) {
-    if (steps[i].recipeId) {
+  for (const { recipeId, id: stepId, imagePath, title, text } of steps) {
+    if (recipeId) {
       await db.query<ResultSetHeader>(
         `UPDATE recipe_steps SET title=?, text=?, imagePath=? WHERE id=?`,
-        [steps[i].title, steps[i].text, steps[i].imagePath, steps[i].id]
+        [title, text, imagePath, stepId]
       );
     } else {
       await db.query<ResultSetHeader>(
         `INSERT INTO recipe_steps (recipeId, title, text, imagePath) values (?, ?, ?, ?)`,
-        [id, steps[i].title, steps[i].text, steps[i].imagePath]
+        [id, title, text, imagePath]
       );
     }
   }
@@ -153,10 +154,10 @@ const removeById = async ({ id }: IDeleteRecipeParams) => {
 const removeAllByIds = async ({ ids }: IBatchDeleteRecipeParams) => {
   const db = await getConnection();
   let deletedCount = 0;
-  for (let i = 0; i < ids.length; i++) {
+  for (const id of ids) {
     const [result] = await db.query<ResultSetHeader>(
       `DELETE FROM recipes WHERE id=?`,
-      [ids[i]]
+      [id]
     );
     if (result.affectedRows === 1) deletedCount++;
   }
