@@ -3,8 +3,7 @@ import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { IUser } from "../../interfaces";
-import { userRepo } from "../../repository";
+import { userRepo } from "../User/repo";
 
 const router = express.Router();
 
@@ -29,7 +28,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const [user]: IUser[] = await userRepo.getByField({
+      const [user] = await userRepo.getByField({
         fieldName: "email",
         fieldValue: email,
       });

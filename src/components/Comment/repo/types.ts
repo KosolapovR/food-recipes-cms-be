@@ -1,4 +1,4 @@
-import { CommentStatusType } from "../../interfaces/IComment";
+import { CommentStatusType } from "../interface";
 
 export interface ICreateCommentParams {
   text: string;

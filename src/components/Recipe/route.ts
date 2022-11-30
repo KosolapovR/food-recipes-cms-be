@@ -3,8 +3,9 @@ import { body } from "express-validator";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { recipeRepo, userRepo } from "../../repository";
 import { IRequestWithToken } from "../../types";
+import { recipeRepo } from "./repo";
+import { userRepo } from "../User/repo";
 
 const router = express.Router();
 

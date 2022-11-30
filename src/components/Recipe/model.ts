@@ -1,5 +1,4 @@
-import { IRecipe, IRecipeStep } from "../interfaces";
-
+import { IRecipe, IRecipeStep } from "./interface";
 /**
  * @typedef RecipeStepModel
  * @property {string} id.required

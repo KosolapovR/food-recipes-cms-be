@@ -1,7 +1,7 @@
-import { IUser } from "../../interfaces";
+import { IUser } from "../interface";
 import { ResultSetHeader } from "mysql2/promise";
-import { getConnection } from "../../db_connection";
-import { IFieldNameValue } from "../types";
+import { getConnection } from "../../../db_connection";
+import { IFieldNameValue } from "../../../types";
 import {
   IBatchDeleteUserParams,
   ICreateUserParams,
@@ -100,7 +100,7 @@ const removeAllByIds = async ({ ids }: IBatchDeleteUserParams) => {
   return deletedCount > 0;
 };
 
-export {
+const userRepo = {
   getById,
   getAll,
   getByField,
@@ -110,3 +110,5 @@ export {
   removeById,
   removeAllByIds,
 };
+
+export { userRepo };

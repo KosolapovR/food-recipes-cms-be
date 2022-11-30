@@ -2,9 +2,10 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { commentRepo, userRepo } from "../../repository";
 import { IRequestWithToken } from "../../types";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { commentRepo } from "./repo";
+import { userRepo } from "../User/repo";
 
 const router = express.Router();
 

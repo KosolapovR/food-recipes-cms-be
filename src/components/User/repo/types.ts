@@ -1,4 +1,4 @@
-import { UserStatusType } from "../../interfaces/IUser";
+import { UserStatusType } from "../interface";
 
 export interface ICreateUserParams {
   email: string;

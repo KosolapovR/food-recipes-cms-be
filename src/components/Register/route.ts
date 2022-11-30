@@ -2,8 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import express, { Request, Response } from "express";
 import { ResultSetHeader } from "mysql2/promise";
-
-import { userRepo } from "../../repository";
+import { userRepo } from "../User/repo";
 
 const router = express.Router();
 

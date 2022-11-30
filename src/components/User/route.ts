@@ -3,8 +3,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { userRepo } from "../../repository";
 import { IRequestWithToken } from "../../types";
+import { userRepo } from "./repo";
 
 const router = express.Router();
 

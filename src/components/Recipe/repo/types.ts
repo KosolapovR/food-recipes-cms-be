@@ -1,5 +1,4 @@
-import { IRecipeStep } from "../../interfaces";
-import { RecipeStatusType } from "../../interfaces/IRecipe";
+import { RecipeStatusType, IRecipeStep } from "../interface";
 
 export interface ICreateRecipeParams {
   title: string;

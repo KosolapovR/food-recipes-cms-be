@@ -1,13 +1,13 @@
 import { ResultSetHeader } from "mysql2/promise";
-import { IComment } from "../../interfaces";
-import { getConnection } from "../../db_connection";
-import { IFieldNameValue } from "../types";
+import { getConnection } from "../../../db_connection";
 import {
   IBatchDeleteCommentParams,
   ICreateCommentParams,
   IDeleteCommentParams,
   IUpdateCommentParams,
 } from "./types";
+import { IFieldNameValue } from "../../../types";
+import { IComment } from "../interface";
 
 const getById = async (id: number) => {
   const db = await getConnection();
@@ -108,7 +108,7 @@ const removeAllByIds = async ({ ids }: IBatchDeleteCommentParams) => {
   return deletedCount > 0;
 };
 
-export {
+const commentRepo = {
   getById,
   getAll,
   getByField,
@@ -118,3 +118,4 @@ export {
   removeById,
   removeAllByIds,
 };
+export { commentRepo };

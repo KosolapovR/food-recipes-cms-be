@@ -7,18 +7,16 @@ const pino = createPino({ transport: { target: "pino-pretty" } });
 //@ts-ignore
 import swaggerGenerator from "express-swagger-generator";
 
-import {
-  authRouter,
-  recipeRouter,
-  registerRouter,
-  uploadRouter,
-  commentRouter,
-  userRouter,
-  healthcheckRouter,
-} from "./routes";
-
 import express from "express";
 import cors from "cors";
+
+import { recipeRouter } from "./components/Recipe/route";
+import { commentRouter } from "./components/Comment/route";
+import { userRouter } from "./components/User/route";
+import { authRouter } from "./components/Auth/route";
+import { healthcheckRouter } from "./components/System/healthcheck/route";
+import { registerRouter } from "./components/Register/route";
+import { uploadRouter } from "./components/FileSystem/route";
 
 const app = express();
 const expressSwagger = swaggerGenerator(app);
@@ -46,7 +44,7 @@ const options = {
   },
   route: { url: "/api/swagger", docs: "/api/swagger.json" },
   basedir: __dirname, //app absolute path
-  files: ["./routes/**/*.ts", "./models/*.ts"], //Path to the API handle folder
+  files: ["./components/**/*.ts"], //Path to the API handle folder
 };
 expressSwagger(options);
 

@@ -1,15 +1,15 @@
 import { ResultSetHeader } from "mysql2/promise";
 
-import { IRecipe, IRecipeStep } from "../../interfaces";
-import { getConnection } from "../../db_connection";
-import { IFieldNameValue } from "../types";
-import { commentRepo } from "../index";
+import { getConnection } from "../../../db_connection";
 import {
   IBatchDeleteRecipeParams,
   ICreateRecipeParams,
   IDeleteRecipeParams,
   IUpdateRecipeParams,
 } from "./types";
+import { commentRepo } from "../../Comment/repo";
+import { IFieldNameValue } from "../../../types";
+import { IRecipe, IRecipeStep } from "../interface";
 
 const getById = async (id: number) => {
   const db = await getConnection();
@@ -164,8 +164,7 @@ const removeAllByIds = async ({ ids }: IBatchDeleteRecipeParams) => {
 
   return deletedCount > 0;
 };
-
-export {
+const recipeRepo = {
   getById,
   getAll,
   getByField,
@@ -175,3 +174,5 @@ export {
   removeById,
   removeAllByIds,
 };
+
+export { recipeRepo };

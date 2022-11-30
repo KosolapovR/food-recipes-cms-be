@@ -1,4 +1,5 @@
-import { IUser } from "../interfaces";
+import { IUser } from "./interface";
+
 /**
  * @typedef UserModel
  * @property {string} id.required

@@ -1,4 +1,4 @@
-import { IComment } from "../interfaces";
+import { IComment } from "./interface";
 
 /**
  * @typedef CommentModel
