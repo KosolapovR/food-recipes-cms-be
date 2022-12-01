@@ -8,9 +8,8 @@
     "migrate": "db-migrate up",
     "build": "tsc",
     "format": "prettier .",
-    "start": "npm run migrate && pm2-runtime ./src/index.ts",
+    "start": "npm run migrate && npm run build && pm2-runtime ./dist/index.js",
     "dev": "npm run migrate && npx nodemon src/index.ts",
-    "postinstall": "pm2 install typescript",
     "lint": "eslint ./src --ext .ts --fix --max-warnings=0"
   },
   "author": "Roman Kosolapov <kosolapov-r@bk.ru>",
