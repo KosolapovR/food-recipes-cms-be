@@ -1,4 +1,4 @@
-import { IRecipe, IRecipeStep } from "./interface";
+import { IRecipeSingle, IRecipeStep } from "./interface";
 /**
  * @typedef RecipeStepModel
  * @property {string} id.required
@@ -11,14 +11,15 @@ export interface RecipeStepModel {
 }
 
 /**
- * @typedef RecipeModel
+ * @typedef RecipeSingleModel
  * @property {string} id.required
  * @property {string} title.required
  * @property {string} status
  * @property {string} previewImagePath.required
+ * @property {string} categoryId.required
  * @property {Array.<RecipeStepModel>} steps
  * @property {Array.<CommentModel>} comments
  */
-export interface RecipeModel {
-  model: IRecipe;
+export interface RecipeSingleModel {
+  model: IRecipeSingle;
 }

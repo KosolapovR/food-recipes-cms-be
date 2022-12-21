@@ -10,11 +10,12 @@ export interface IRecipeStep extends RowDataPacket {
 
 export type RecipeStatusType = "inactive" | "active";
 
-export interface IRecipe extends RowDataPacket {
+export interface IRecipeSingle extends RowDataPacket {
   id: number;
   title: string;
   steps: IRecipeStep[];
   comments: IComment[];
+  categoryId: string;
   status: RecipeStatusType;
   previewImagePath: string;
 }

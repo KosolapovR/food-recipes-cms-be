@@ -21,7 +21,7 @@ export const protectedRoute = (
   } else {
     return res.sendStatus(403);
   }
-  let verifyOptions: VerifyOptions = { complete: false };
+  const verifyOptions: VerifyOptions = { complete: false };
   const verifyCallback: VerifyCallback<any> = (
     err: VerifyErrors | null,
     payload: IRequestWithToken

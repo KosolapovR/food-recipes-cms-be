@@ -25,7 +25,10 @@ router.use(protectedRoute);
  */
 router.put(
   "/Update",
-  async function (req: Request<{}, IUser, IUpdateUserParams>, res: Response) {
+  async function (
+    req: Request<Record<string, unknown>, IUser, IUpdateUserParams>,
+    res: Response
+  ) {
     try {
       const { id, email, password, isAdmin, status } = req.body;
 

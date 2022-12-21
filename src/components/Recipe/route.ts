@@ -17,7 +17,7 @@ router.use(protectedRoute);
  * @param {string} title.body.required
  * @param {string} previewImagePath.body
  * @param {Array.<RecipeStepModel>} steps.body.required
- * @returns {RecipeModel.model} 201
+ * @returns {RecipeSingleModel.model} 201
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -56,7 +56,7 @@ router.post(
  * @param {string} title.body.required
  * @param {string} image.body
  * @param {Array.<RecipeStepModel>} steps.body.required
- * @returns {RecipeModel.model} 200
+ * @returns {RecipeSingleModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -92,7 +92,7 @@ router.put(
 /**
  * @route GET /recipe
  * @group Recipe - Operations about recipe
- * @returns {Array.<RecipeModel>} 200
+ * @returns {Array.<RecipeSingleModel>} 200
  * @returns {Error}  400
  * @returns {Error}  403 - Wrong credentials
  */
@@ -122,7 +122,7 @@ router.get("/", async function (req: Request, res: Response) {
  * @route GET /recipe/{id}
  * @param {string} id.params.required
  * @group Recipe - Operations about recipe
- * @returns {RecipeModel.model} 200
+ * @returns {RecipeSingleModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -201,7 +201,7 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @route POST /recipe/Activate
  * @group Recipe - Operations about recipe
  * @param {number} id.body.required
- * @returns {RecipeModel.model} 200
+ * @returns {RecipeSingleModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -247,7 +247,7 @@ router.post(
  * @route POST /recipe/Deactivate
  * @group Recipe - Operations about recipe
  * @param {number} id.body.required
- * @returns {RecipeModel.model} 200
+ * @returns {RecipeSingleModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */

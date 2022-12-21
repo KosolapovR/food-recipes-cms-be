@@ -9,17 +9,17 @@ import {
 } from "./types";
 import { commentRepo } from "../../Comment/repo";
 import { IFieldNameValue } from "../../../types";
-import { IRecipe, IRecipeStep } from "../interface";
+import { IRecipeSingle, IRecipeStep } from "../interface";
 
 const getById = async (id: number) => {
   const db = await getConnection();
-  const [rows] = await db.query<IRecipe[]>(
+  const [rows] = await db.query<IRecipeSingle[]>(
     `SELECT * FROM recipes WHERE recipes.id=?`,
     [id]
   );
   if (!rows) return rows;
 
-  const recipe: IRecipe | undefined = rows[0];
+  const recipe: IRecipeSingle | undefined = rows[0];
   if (!recipe) return recipe;
 
   const [steps] = await db.query<IRecipeStep[]>(
@@ -37,7 +37,7 @@ const getById = async (id: number) => {
 
 const getAll = async () => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipe[]>("SELECT * FROM recipes");
+  const [recipes] = await db.query<IRecipeSingle[]>("SELECT * FROM recipes");
   for (const recipe of recipes) {
     const [steps] = await db.query<IRecipeStep[]>(
       `SELECT * FROM recipe_steps WHERE recipeId=?`,
@@ -55,7 +55,7 @@ const getAll = async () => {
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipe[]>(
+  const [recipes] = await db.query<IRecipeSingle[]>(
     `SELECT * FROM recipes WHERE ${fieldName}=?`,
     [fieldValue]
   );

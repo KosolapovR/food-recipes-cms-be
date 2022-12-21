@@ -9,3 +9,15 @@ export interface IRequestWithToken extends Request {
   token?: string;
   user_id?: string;
 }
+
+export type CommonUpdateDTOType<T> = {
+  id: number;
+} & T;
+
+export type CommonDeleteDTOType = {
+  id: number;
+};
+
+export type CommonBatchDeleteDTOType = {
+  ids: number[];
+};

@@ -17,6 +17,7 @@ import { authRouter } from "./components/Auth/route";
 import { healthcheckRouter } from "./components/System/healthcheck/route";
 import { registerRouter } from "./components/Register/route";
 import { uploadRouter } from "./components/FileSystem/route";
+import { categoryRouter } from "./components/Category/route";
 
 const app = express();
 const expressSwagger = swaggerGenerator(app);
@@ -63,6 +64,7 @@ app.use("/recipe", recipeRouter);
 app.use("/register", registerRouter);
 app.use("/upload", uploadRouter);
 app.use("/user", userRouter);
+app.use("/category", categoryRouter);
 
 app.listen(port, () => {
   pino.logger.info(`Server started on ${port} port`);

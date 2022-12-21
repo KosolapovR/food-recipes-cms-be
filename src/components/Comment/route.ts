@@ -29,7 +29,11 @@ router.post(
   body("userId").not().isEmpty().trim(),
   body("recipeId").not().isEmpty().trim(),
   async function (
-    req: Request<{}, IComment, Partial<ICreateCommentParams>>,
+    req: Request<
+      Record<string, unknown>,
+      IComment,
+      Partial<ICreateCommentParams>
+    >,
     res: Response
   ) {
     try {
