@@ -1,34 +1,37 @@
 import { ResultSetHeader } from "mysql2/promise";
 import { getConnection } from "../../../db_connection";
 import {
-  IBatchDeleteCommentParams,
-  ICreateCommentParams,
-  IDeleteCommentParams,
-  IUpdateCommentParams,
-} from "./types";
-import { IFieldNameValue } from "../../../types";
-import { IComment } from "../interface";
+  CommonBatchDeleteDTOType,
+  CommonDeleteDTOType,
+  IFieldNameValue,
+} from "../../../types";
+import {
+  ICommentCreateDTO,
+  ICommentGroupDTO,
+  ICommentSingleDTO,
+} from "../interface";
+import { INACTIVE_STATUS } from "../../../consts";
 
 const getById = async (id: number) => {
   const db = await getConnection();
-  const [rows] = await db.query<IComment[]>(
+  const [rows] = await db.query<ICommentSingleDTO[]>(
     `SELECT * FROM comments WHERE comments.id=?`,
     [id]
   );
-  const comment: IComment | undefined = rows[0];
+  const comment: ICommentSingleDTO | undefined = rows[0];
   return comment;
 };
 
 const getAll = async () => {
   const db = await getConnection();
-  const [rows] = await db.query<IComment[]>("SELECT * FROM comments");
+  const [rows] = await db.query<ICommentGroupDTO[]>("SELECT * FROM comments");
 
   return rows;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [rows] = await db.query<IComment[]>(
+  const [rows] = await db.query<ICommentGroupDTO[]>(
     `SELECT * FROM comments WHERE ${fieldName}=?`,
     [fieldValue]
   );
@@ -36,39 +39,15 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   return rows;
 };
 
-const add = async ({
-  text,
-  userId,
-  recipeId,
-  status,
-  date,
-}: ICreateCommentParams) => {
+const add = async ({ text, userId, recipeId }: ICommentCreateDTO) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
-    `INSERT INTO comments (text, userId, recipeId, status, date) values (?, ?, ?, ?, ?)`,
-    [text, userId, recipeId, status, date]
+    `INSERT INTO comments (text, userId, recipeId, date, status) values (?, ?, ?, ?, ?)`,
+    [text, userId, recipeId, new Date(), INACTIVE_STATUS]
   );
 
   return await getById(result.insertId);
-};
-
-const update = async ({
-  id,
-  text,
-  userId,
-  recipeId,
-  status,
-  date,
-}: IUpdateCommentParams) => {
-  const db = await getConnection();
-
-  await db.query<ResultSetHeader>(
-    `UPDATE comments SET text=?, userId=?, recipeId=?, status=?, date=? WHERE id=?`,
-    [text, userId, recipeId, status, date, id]
-  );
-
-  return await getById(id);
 };
 
 const updateByField = async ({
@@ -84,7 +63,7 @@ const updateByField = async ({
   return await getById(id);
 };
 
-const removeById = async ({ id }: IDeleteCommentParams) => {
+const removeById = async ({ id }: CommonDeleteDTOType) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
@@ -94,7 +73,7 @@ const removeById = async ({ id }: IDeleteCommentParams) => {
   return result.affectedRows === 1;
 };
 
-const removeAllByIds = async ({ ids }: IBatchDeleteCommentParams) => {
+const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   const db = await getConnection();
   let deletedCount = 0;
   for (const id of ids) {
@@ -113,7 +92,6 @@ const commentRepo = {
   getAll,
   getByField,
   add,
-  update,
   updateByField,
   removeById,
   removeAllByIds,

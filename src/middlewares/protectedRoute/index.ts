@@ -4,12 +4,12 @@ import jwt, {
   VerifyErrors,
   VerifyOptions,
 } from "jsonwebtoken";
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { IRequestWithToken } from "../../types";
 
 export const protectedRoute = (
-  req: IRequestWithToken,
+  req: IRequestWithToken<Record<string, unknown>, Record<string, unknown>>,
   res: Response,
   next: NextFunction
 ) => {
@@ -22,9 +22,9 @@ export const protectedRoute = (
     return res.sendStatus(403);
   }
   const verifyOptions: VerifyOptions = { complete: false };
-  const verifyCallback: VerifyCallback<any> = (
+  const verifyCallback: VerifyCallback<Request<Record<string, unknown>>> = (
     err: VerifyErrors | null,
-    payload: IRequestWithToken
+    payload: IRequestWithToken<Record<string, unknown>, Record<string, unknown>>
   ) => {
     if (err) {
       return res.sendStatus(403);

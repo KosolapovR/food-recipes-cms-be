@@ -3,10 +3,10 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { IRequestWithToken } from "../../types";
+import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
 import { userRepo } from "./repo";
-import { IUser } from "./interface";
-import { IUpdateUserParams } from "./repo/types";
+import { IUserSingleDTO, IUserUpdateDTO } from "./interface";
+import { IRecipeSingleDTO } from "../Recipe/interface";
 
 const router = express.Router();
 
@@ -15,18 +15,15 @@ router.use(protectedRoute);
 /**
  * @route PUT /user/Update
  * @group User - Operations about user
- * @param {number} id.body.required
- * @param {string} email.body.required
- * @param {string} password.body
- * @param {status} status.body
- * @returns {UserModel.model} 200
+ * @param {UserUpdateDtoModel.model} data.body.required
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.put(
   "/Update",
   async function (
-    req: Request<Record<string, unknown>, IUser, IUpdateUserParams>,
+    req: IRequest<IUserUpdateDTO, IUserSingleDTO>,
     res: Response
   ) {
     try {
@@ -72,28 +69,31 @@ router.put(
 /**
  * @route GET /user
  * @group User - Operations about user
- * @returns {Array.<UserModel>} 200
+ * @returns {Array.<UserGroupDtoModel>} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
-  try {
-    const result = await userRepo.getAll();
-    if (!result) {
-      return res.status(400).send("Cannot get users");
-    }
+router.get(
+  "/",
+  async function (req: IRequest<void, IRecipeSingleDTO>, res: Response) {
+    try {
+      const result = await userRepo.getAll();
+      if (!result) {
+        return res.status(400).send("Cannot get users");
+      }
 
-    return res.status(200).send({ data: result });
-  } catch (error) {
-    return res.status(500).json({ error: error });
+      return res.status(200).send({ data: result });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
   }
-});
+);
 
 /**
  * @route GET /user/{id}
- * @param {string} id.params.required
  * @group User - Operations about user
- * @returns {UserModel.model} 200
+ * @param {string} id.params.required
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -172,13 +172,16 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @route POST /user/Activate
  * @group User - Operations about user
  * @param {number} id.body.required
- * @returns {UserModel.model} 200
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.post(
   "/Activate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
@@ -218,13 +221,16 @@ router.post(
  * @route POST /user/Deactivate
  * @group User - Operations about user
  * @param {number} id.body.required
- * @returns {UserModel.model} 200
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.post(
   "/Deactivate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IUserSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 

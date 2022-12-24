@@ -1,43 +1,50 @@
-import { IUser } from "../interface";
 import { ResultSetHeader } from "mysql2/promise";
 import { getConnection } from "../../../db_connection";
-import { IFieldNameValue } from "../../../types";
 import {
-  IBatchDeleteUserParams,
-  ICreateUserParams,
-  IDeleteUserParams,
-  IUpdateUserParams,
-} from "./types";
+  CommonBatchDeleteDTOType,
+  CommonDeleteDTOType,
+  IFieldNameValue,
+} from "../../../types";
+import {
+  IUserCreateDTO,
+  IUserGroupDTO,
+  IUserSingleDTO,
+  IUserUpdateDTO,
+} from "../interface";
+import { INACTIVE_STATUS } from "../../../consts";
 
 const getAll = async () => {
   const db = await getConnection();
-  const [rows] = await db.query<IUser[]>("SELECT * FROM users");
+  const [rows] = await db.query<IUserGroupDTO[]>(
+    `SELECT id, email, isAdmin, status FROM users`
+  );
   return rows;
 };
 
 const getById = async (id: number) => {
   const db = await getConnection();
-  const [rows] = await db.query<IUser[]>(`SELECT * FROM users WHERE id=?`, [
-    id,
-  ]);
-  const user: IUser | undefined = rows[0];
+  const [rows] = await db.query<IUserSingleDTO[]>(
+    `SELECT * FROM users WHERE id=?`,
+    [id]
+  );
+  const user: IUserSingleDTO | undefined = rows[0];
   return user;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [rows] = await db.query<IUser[]>(
+  const [rows] = await db.query<IUserSingleDTO[]>(
     `SELECT * FROM users WHERE ${fieldName}=?`,
     [fieldValue]
   );
   return rows;
 };
 
-const add = async ({ email, password, isAdmin, status }: ICreateUserParams) => {
+const add = async ({ email, password, isAdmin }: IUserCreateDTO) => {
   const db = await getConnection();
   const [rows] = await db.query<ResultSetHeader>(
     `INSERT INTO users (email, password, isAdmin, status) values (?, ?, ?, ?)`,
-    [email, password, isAdmin, status]
+    [email, password, isAdmin, INACTIVE_STATUS]
   );
   return rows;
 };
@@ -48,7 +55,7 @@ const update = async ({
   password,
   isAdmin,
   status,
-}: IUpdateUserParams) => {
+}: IUserUpdateDTO) => {
   const db = await getConnection();
   if (password) {
     await db.query<ResultSetHeader>(
@@ -77,7 +84,7 @@ const updateByField = async ({
   return await getById(id);
 };
 
-const removeById = async ({ id }: IDeleteUserParams) => {
+const removeById = async ({ id }: CommonDeleteDTOType) => {
   const db = await getConnection();
   const [result] = await db.query<ResultSetHeader>(
     `DELETE FROM users WHERE id=?`,
@@ -86,7 +93,7 @@ const removeById = async ({ id }: IDeleteUserParams) => {
   return result.affectedRows === 1;
 };
 
-const removeAllByIds = async ({ ids }: IBatchDeleteUserParams) => {
+const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   const db = await getConnection();
   let deletedCount = 0;
   for (const id of ids) {

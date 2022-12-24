@@ -1,25 +1,29 @@
 import { ResultSetHeader } from "mysql2/promise";
-
 import { getConnection } from "../../../db_connection";
-import {
-  IBatchDeleteRecipeParams,
-  ICreateRecipeParams,
-  IDeleteRecipeParams,
-  IUpdateRecipeParams,
-} from "./types";
 import { commentRepo } from "../../Comment/repo";
-import { IFieldNameValue } from "../../../types";
-import { IRecipeSingle, IRecipeStep } from "../interface";
+import {
+  CommonBatchDeleteDTOType,
+  CommonDeleteDTOType,
+  IFieldNameValue,
+} from "../../../types";
+import {
+  IRecipeSingleDTO,
+  IRecipeStep,
+  IRecipeGroupDTO,
+  IRecipeCreateDTO,
+  IRecipeUpdateDTO,
+} from "../interface";
+import { INACTIVE_STATUS } from "../../../consts";
 
 const getById = async (id: number) => {
   const db = await getConnection();
-  const [rows] = await db.query<IRecipeSingle[]>(
+  const [rows] = await db.query<IRecipeSingleDTO[]>(
     `SELECT * FROM recipes WHERE recipes.id=?`,
     [id]
   );
   if (!rows) return rows;
 
-  const recipe: IRecipeSingle | undefined = rows[0];
+  const recipe: IRecipeSingleDTO | undefined = rows[0];
   if (!recipe) return recipe;
 
   const [steps] = await db.query<IRecipeStep[]>(
@@ -37,25 +41,13 @@ const getById = async (id: number) => {
 
 const getAll = async () => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipeSingle[]>("SELECT * FROM recipes");
-  for (const recipe of recipes) {
-    const [steps] = await db.query<IRecipeStep[]>(
-      `SELECT * FROM recipe_steps WHERE recipeId=?`,
-      [recipe.id]
-    );
-    const comments = await commentRepo.getByField({
-      fieldName: "recipeId",
-      fieldValue: recipe.id,
-    });
-    recipe.steps = steps;
-    recipe.comments = comments;
-  }
+  const [recipes] = await db.query<IRecipeGroupDTO[]>("SELECT * FROM recipes");
   return recipes;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipeSingle[]>(
+  const [recipes] = await db.query<IRecipeSingleDTO[]>(
     `SELECT * FROM recipes WHERE ${fieldName}=?`,
     [fieldValue]
   );
@@ -76,17 +68,12 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   return recipes;
 };
 
-const add = async ({
-  title,
-  steps,
-  status,
-  previewImagePath,
-}: ICreateRecipeParams) => {
+const add = async ({ title, steps, previewImagePath }: IRecipeCreateDTO) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
     `INSERT INTO recipes (title, previewImagePath, status) values (?, ?, ?)`,
-    [title, previewImagePath, status]
+    [title, previewImagePath, INACTIVE_STATUS]
   );
   for (const { title, text, imagePath } of steps) {
     await db.query<ResultSetHeader>(
@@ -104,7 +91,7 @@ const update = async ({
   steps,
   previewImagePath,
   status,
-}: IUpdateRecipeParams) => {
+}: IRecipeUpdateDTO) => {
   const db = await getConnection();
 
   await db.query<ResultSetHeader>(
@@ -141,7 +128,7 @@ const updateByField = async ({
   return await getById(id);
 };
 
-const removeById = async ({ id }: IDeleteRecipeParams) => {
+const removeById = async ({ id }: CommonDeleteDTOType) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
@@ -151,7 +138,7 @@ const removeById = async ({ id }: IDeleteRecipeParams) => {
   return result.affectedRows === 1;
 };
 
-const removeAllByIds = async ({ ids }: IBatchDeleteRecipeParams) => {
+const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   const db = await getConnection();
   let deletedCount = 0;
   for (const id of ids) {

@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { body } from "express-validator";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
 import { categoryRepo } from "./repo";
@@ -7,7 +8,9 @@ import {
   ICategorySingleDTO,
   ICategoryUpdateDTO,
 } from "./interface";
-import { body } from "express-validator";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { userRepo } from "../User/repo";
+import { IRequest, IRequestWithToken } from "../../types";
 
 const router = express.Router();
 
@@ -25,11 +28,7 @@ router.post(
   "/Create",
   body("name").not().isEmpty().trim(),
   async function (
-    req: Request<
-      Record<string, unknown>,
-      ICategorySingleDTO,
-      ICategoryCreateDTO
-    >,
+    req: IRequestWithToken<ICategoryCreateDTO, ICategorySingleDTO>,
     res: Response
   ) {
     try {
@@ -37,6 +36,17 @@ router.post(
 
       if (!name) {
         return res.status(400).send("Required fields: name");
+      }
+      //TODO extract permission checking logic
+      const { email } = jwt.decode(req.token) as JwtPayload;
+
+      const [currentUser] = await userRepo.getByField({
+        fieldName: "email",
+        fieldValue: email,
+      });
+
+      if (!currentUser.isAdmin) {
+        return res.status(401).send("Not enough rights for operation");
       }
 
       const category = await categoryRepo.add({
@@ -65,11 +75,7 @@ router.post(
 router.put(
   "/Update",
   async function (
-    req: Request<
-      Record<string, unknown>,
-      ICategorySingleDTO,
-      ICategoryUpdateDTO
-    >,
+    req: IRequest<ICategoryUpdateDTO, ICategorySingleDTO>,
     res: Response
   ) {
     try {

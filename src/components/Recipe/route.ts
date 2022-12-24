@@ -3,9 +3,10 @@ import { body } from "express-validator";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { IRequestWithToken } from "../../types";
+import { CommonDeleteDTOType, IRequestWithToken } from "../../types";
 import { recipeRepo } from "./repo";
 import { userRepo } from "../User/repo";
+import { IRecipeSingleDTO } from "./interface";
 
 const router = express.Router();
 
@@ -14,10 +15,8 @@ router.use(protectedRoute);
 /**
  * @route POST /recipe/Create
  * @group Recipe - Operations about recipe
- * @param {string} title.body.required
- * @param {string} previewImagePath.body
- * @param {Array.<RecipeStepModel>} steps.body.required
- * @returns {RecipeSingleModel.model} 201
+ * @param {RecipeCreateDtoModel.model} data.body.required
+ * @returns {RecipeSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -36,7 +35,6 @@ router.post(
         title,
         steps,
         previewImagePath,
-        status: "inactive",
       });
       if (!recipe) {
         return res.status(400).send("Cannot add recipe");
@@ -52,11 +50,8 @@ router.post(
 /**
  * @route PUT /recipe/Update
  * @group Recipe - Operations about recipe
- * @param {number} id.body.required
- * @param {string} title.body.required
- * @param {string} image.body
- * @param {Array.<RecipeStepModel>} steps.body.required
- * @returns {RecipeSingleModel.model} 200
+ * @param {RecipeUpdateDtoModel.model} data.body.required
+ * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -92,7 +87,7 @@ router.put(
 /**
  * @route GET /recipe
  * @group Recipe - Operations about recipe
- * @returns {Array.<RecipeSingleModel>} 200
+ * @returns {Array.<RecipeGroupDtoModel>} 200
  * @returns {Error}  400
  * @returns {Error}  403 - Wrong credentials
  */
@@ -120,9 +115,9 @@ router.get("/", async function (req: Request, res: Response) {
 
 /**
  * @route GET /recipe/{id}
- * @param {string} id.params.required
  * @group Recipe - Operations about recipe
- * @returns {RecipeSingleModel.model} 200
+ * @param {string} id.params.required
+ * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
@@ -146,7 +141,7 @@ router.get("/:id", async function (req: Request, res: Response) {
 /**
  * @route POST /recipe/Delete
  * @group Recipe - Operations about recipe
- *  @param {number} id.body.required
+ * @param {number} id.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
@@ -201,13 +196,16 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @route POST /recipe/Activate
  * @group Recipe - Operations about recipe
  * @param {number} id.body.required
- * @returns {RecipeSingleModel.model} 200
+ * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.post(
   "/Activate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
@@ -247,13 +245,16 @@ router.post(
  * @route POST /recipe/Deactivate
  * @group Recipe - Operations about recipe
  * @param {number} id.body.required
- * @returns {RecipeSingleModel.model} 200
+ * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
  * @returns {Error}  403 - Wrong credentials
  */
 router.post(
   "/Deactivate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
