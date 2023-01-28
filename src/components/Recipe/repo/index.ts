@@ -7,10 +7,10 @@ import {
   IFieldNameValue,
 } from "../../../types";
 import {
+  IRecipeCreateDTO,
+  IRecipeGroupDTO,
   IRecipeSingleDTO,
   IRecipeStep,
-  IRecipeGroupDTO,
-  IRecipeCreateDTO,
   IRecipeUpdateDTO,
 } from "../interface";
 import { INACTIVE_STATUS } from "../../../consts";
@@ -90,13 +90,14 @@ const update = async ({
   title,
   steps,
   previewImagePath,
+  categoryId,
   status,
 }: IRecipeUpdateDTO) => {
   const db = await getConnection();
 
   await db.query<ResultSetHeader>(
-    `UPDATE recipes SET title=?, previewImagePath=?, status=? WHERE id=?`,
-    [title, previewImagePath, status, id]
+    `UPDATE recipes SET title=?, previewImagePath=?, categoryId=?, status=? WHERE id=?`,
+    [title, previewImagePath, categoryId, status, id]
   );
 
   for (const { recipeId, id: stepId, imagePath, title, text } of steps) {

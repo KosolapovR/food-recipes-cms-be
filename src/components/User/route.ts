@@ -75,9 +75,18 @@ router.put(
  */
 router.get(
   "/",
-  async function (req: IRequest<void, IRecipeSingleDTO>, res: Response) {
+  async function (req: IRequest<void, IUserSingleDTO>, res: Response) {
+    const { status } = req.query;
     try {
-      const result = await userRepo.getAll();
+      let result;
+      if (status) {
+        result = await userRepo.getByField({
+          fieldName: "status",
+          fieldValue: status as string,
+        });
+      } else {
+        result = await userRepo.getAll();
+      }
       if (!result) {
         return res.status(400).send("Cannot get users");
       }

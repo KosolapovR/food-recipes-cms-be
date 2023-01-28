@@ -3,10 +3,10 @@ import { body } from "express-validator";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { protectedRoute } from "../../middlewares/protectedRoute";
-import { CommonDeleteDTOType, IRequestWithToken } from "../../types";
+import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
 import { recipeRepo } from "./repo";
 import { userRepo } from "../User/repo";
-import { IRecipeSingleDTO } from "./interface";
+import { IRecipeSingleDTO, IRecipeUpdateDTO } from "./interface";
 
 const router = express.Router();
 
@@ -58,11 +58,15 @@ router.post(
 router.put(
   "/Update",
   body("title").not().isEmpty().trim(),
-  async function (req: Request, res: Response) {
+  async function (
+    req: IRequest<IRecipeUpdateDTO, IRecipeSingleDTO>,
+    res: Response
+  ) {
     try {
-      const { id, title, steps, status, previewImagePath } = req.body;
+      const { id, title, steps, status, categoryId, previewImagePath } =
+        req.body;
 
-      if (!(title && steps && status)) {
+      if (!(title || steps || status || categoryId)) {
         return res.status(400).send("All input is required");
       }
 
@@ -70,6 +74,7 @@ router.put(
         id,
         title,
         steps,
+        categoryId,
         previewImagePath,
         status,
       });
@@ -91,27 +96,30 @@ router.put(
  * @returns {Error}  400
  * @returns {Error}  403 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
-  const { status } = req.query;
-  try {
-    let result;
-    if (status) {
-      result = await recipeRepo.getByField({
-        fieldName: "status",
-        fieldValue: status as string,
-      });
-    } else {
-      result = await recipeRepo.getAll();
-    }
+router.get(
+  "/",
+  async function (req: IRequest<void, IRecipeSingleDTO>, res: Response) {
+    const { status } = req.query;
+    try {
+      let result;
+      if (status) {
+        result = await recipeRepo.getByField({
+          fieldName: "status",
+          fieldValue: status as string,
+        });
+      } else {
+        result = await recipeRepo.getAll();
+      }
 
-    if (!result) {
-      return res.status(400).send("Cannot get recipes");
+      if (!result) {
+        return res.status(400).send("Cannot get recipes");
+      }
+      return res.status(200).send({ data: result });
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-    return res.status(200).send({ data: result });
-  } catch (error) {
-    return res.status(500).json({ error: error });
   }
-});
+);
 
 /**
  * @route GET /recipe/{id}
