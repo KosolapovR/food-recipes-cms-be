@@ -19,7 +19,7 @@ export const protectedRoute = (
     const [, token] = header.split(" ");
     req.token = token;
   } else {
-    return res.sendStatus(403);
+    return res.sendStatus(401);
   }
   const verifyOptions: VerifyOptions = { complete: false };
   const verifyCallback: VerifyCallback<Request<Record<string, unknown>>> = (
@@ -27,7 +27,7 @@ export const protectedRoute = (
     payload: IRequestWithToken<Record<string, unknown>, Record<string, unknown>>
   ) => {
     if (err) {
-      return res.sendStatus(403);
+      return res.sendStatus(401);
     } else {
       req.user_id = payload.user_id;
       next();

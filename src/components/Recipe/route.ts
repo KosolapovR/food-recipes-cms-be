@@ -1,12 +1,10 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
-import jwt, { JwtPayload } from "jsonwebtoken";
 
-import { protectedRoute } from "../../middlewares/protectedRoute";
+import { protectedRoute, isAdmin } from "../../middlewares";
 import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
-import { recipeRepo } from "./repo";
-import { userRepo } from "../User/repo";
 import { IRecipeSingleDTO, IRecipeUpdateDTO } from "./interface";
+import { recipeRepo } from "./repo";
 
 const router = express.Router();
 
@@ -18,7 +16,7 @@ router.use(protectedRoute);
  * @param {RecipeCreateDtoModel.model} data.body.required
  * @returns {RecipeSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Create",
@@ -53,7 +51,7 @@ router.post(
  * @param {RecipeUpdateDtoModel.model} data.body.required
  * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.put(
   "/Update",
@@ -94,7 +92,7 @@ router.put(
  * @group Recipe - Operations about recipe
  * @returns {Array.<RecipeGroupDtoModel>} 200
  * @returns {Error}  400
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get(
   "/",
@@ -127,7 +125,7 @@ router.get(
  * @param {string} id.params.required
  * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
@@ -152,9 +150,9 @@ router.get("/:id", async function (req: Request, res: Response) {
  * @param {number} id.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
-router.post("/Delete", async function (req: Request, res: Response) {
+router.post("/Delete", isAdmin, async function (req: Request, res: Response) {
   try {
     const { id } = req.body;
 
@@ -179,7 +177,7 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @param {Array<number>} ids.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/BatchDelete", async function (req: Request, res: Response) {
   try {
@@ -206,10 +204,11 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @param {number} id.body.required
  * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Activate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
     res: Response
@@ -219,17 +218,6 @@ router.post(
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const activatedRecipe = await recipeRepo.updateByField({
@@ -255,10 +243,11 @@ router.post(
  * @param {number} id.body.required
  * @returns {RecipeSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Deactivate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
     res: Response
@@ -268,17 +257,6 @@ router.post(
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const deactivatedRecipe = await recipeRepo.updateByField({

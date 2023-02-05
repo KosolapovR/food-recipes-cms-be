@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { uuid } from "uuidv4";
 import multer from "multer";
 
-import { protectedRoute } from "../../middlewares/protectedRoute";
+import { protectedRoute } from "../../middlewares";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -50,7 +50,7 @@ router.use(protectedRoute);
  * @param {string} image.body
  * @returns {UploadModel.model} 201 - return imagePath
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/",

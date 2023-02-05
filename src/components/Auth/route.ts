@@ -12,7 +12,7 @@ const router = express.Router();
  * @group Auth - Operations about auth
  * @param {string} email.body.required
  * @param {string} password.body.required
- * @returns {UserModel.model} 201
+ * @returns {UserSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
  * @returns {Error}  404 - Wrong credentials
  */
@@ -46,7 +46,7 @@ router.post(
           }
 
           // save user token
-          user.token = jwt.sign({ user_id: user.id, email }, secret, {
+          user.token = jwt.sign({ user_id: user.id }, secret, {
             expiresIn: "2h",
           });
 

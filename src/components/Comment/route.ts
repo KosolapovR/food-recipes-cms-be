@@ -1,9 +1,8 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { protectedRoute } from "../../middlewares/protectedRoute";
+import { protectedRoute, isAdmin } from "../../middlewares";
 import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { commentRepo } from "./repo";
 import { userRepo } from "../User/repo";
 import { ICommentCreateDTO, ICommentSingleDTO } from "./interface";
@@ -18,7 +17,7 @@ router.use(protectedRoute);
  * @param {CommentCreateDtoModel.model} data.body.required
  * @returns {CommentSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Create",
@@ -57,7 +56,7 @@ router.post(
  * @group Comment - Operations about comment
  * @returns {Array.<CommentGroupDtoModel>} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get("/", async function (req: Request, res: Response) {
   try {
@@ -78,7 +77,7 @@ router.get("/", async function (req: Request, res: Response) {
  * @param {string} id.params.required
  * @returns {CommentSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
@@ -103,7 +102,7 @@ router.get("/:id", async function (req: Request, res: Response) {
  * @param {number} id.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/Delete", async function (req: Request, res: Response) {
   try {
@@ -130,7 +129,7 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @param {Array<number>} ids.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/BatchDelete", async function (req: Request, res: Response) {
   try {
@@ -157,10 +156,11 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @param {number} id.body.required
  * @returns {CommentSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Activate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, ICommentSingleDTO>,
     res: Response
@@ -170,17 +170,6 @@ router.post(
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const activatedComment = await commentRepo.updateByField({
@@ -206,10 +195,11 @@ router.post(
  * @param {number} id.body.required
  * @returns {CommentSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Deactivate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, ICommentSingleDTO>,
     res: Response
@@ -219,17 +209,6 @@ router.post(
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const deactivatedComment = await userRepo.updateByField({
