@@ -1,13 +1,11 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
-import { protectedRoute } from "../../middlewares/protectedRoute";
-import { IRequestWithToken } from "../../types";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { protectedRoute, isAdmin } from "../../middlewares";
+import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
 import { commentRepo } from "./repo";
 import { userRepo } from "../User/repo";
-import { IComment } from "./interface";
-import { ICreateCommentParams } from "./repo/types";
+import { ICommentCreateDTO, ICommentSingleDTO } from "./interface";
 
 const router = express.Router();
 
@@ -16,12 +14,10 @@ router.use(protectedRoute);
 /**
  * @route POST /comment/Create
  * @group Comment - Operations about comment
- * @param {string} text.body.required
- * @param {number} userId.body.required
- * @param {number} recipeId.body.required
- * @returns {CommentModel.model} 201
+ * @param {CommentCreateDtoModel.model} data.body.required
+ * @returns {CommentSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Create",
@@ -29,7 +25,7 @@ router.post(
   body("userId").not().isEmpty().trim(),
   body("recipeId").not().isEmpty().trim(),
   async function (
-    req: Request<{}, IComment, Partial<ICreateCommentParams>>,
+    req: IRequest<ICommentCreateDTO, ICommentSingleDTO>,
     res: Response
   ) {
     try {
@@ -43,8 +39,6 @@ router.post(
         text,
         userId,
         recipeId,
-        date: new Date(),
-        status: "inactive",
       });
       if (!comment) {
         return res.status(400).send("Cannot add comment");
@@ -58,52 +52,11 @@ router.post(
 );
 
 /**
- * @route PUT /comment/Update
- * @group Comment - Operations about comment
- * @param {number} id.body.required
- * @param {string} text.body.required
- * @param {number} userId.body.required
- * @param {number} recipeId.body.required
- * @returns {CommentModel.model} 200
- * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
- */
-router.put(
-  "/Update",
-  body("text").not().isEmpty().trim(),
-  async function (req: Request, res: Response) {
-    try {
-      const { id, text, userId, recipeId, date, status } = req.body;
-
-      if (!(text && userId && recipeId)) {
-        return res.status(400).send("All input is required");
-      }
-
-      const comment = await commentRepo.update({
-        id,
-        text,
-        userId,
-        recipeId,
-        date,
-        status,
-      });
-      if (!comment) {
-        return res.status(400).send("Cannot update comment");
-      }
-
-      return res.status(200).send({ data: comment });
-    } catch (error) {
-      return res.status(500).json({ error });
-    }
-  }
-);
-
-/**
  * @route GET /comment
  * @group Comment - Operations about comment
- * @returns {Array.<CommentModel>} 200
+ * @returns {Array.<CommentGroupDtoModel>} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get("/", async function (req: Request, res: Response) {
   try {
@@ -119,12 +72,37 @@ router.get("/", async function (req: Request, res: Response) {
 });
 
 /**
+ * @route GET /comment/{id}
+ * @group Comment - Operations about comment
+ * @param {string} id.params.required
+ * @returns {CommentSingleDtoModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  401 - Wrong credentials
+ */
+router.get("/:id", async function (req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params.id);
+    if (!id || Number.isNaN(id)) {
+      return res.status(400).send(`Cannot get comment by id ${req.params.id}`);
+    }
+    const result = await commentRepo.getById(id);
+    if (!result) {
+      return res.status(400).send("Cannot get comment");
+    }
+
+    return res.status(200).send({ data: result });
+  } catch (error) {
+    return res.status(500).json({ error: error });
+  }
+});
+
+/**
  * @route POST /comment/Delete
  * @group Comment - Operations about comment
- *  @param {number} id.body.required
+ * @param {number} id.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/Delete", async function (req: Request, res: Response) {
   try {
@@ -151,7 +129,7 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @param {Array<number>} ids.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/BatchDelete", async function (req: Request, res: Response) {
   try {
@@ -176,29 +154,22 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @route POST /comment/Activate
  * @group Comment - Operations about comment
  * @param {number} id.body.required
- * @returns {CommentModel.model} 200
+ * @returns {CommentSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Activate",
-  async function (req: IRequestWithToken, res: Response) {
+  isAdmin,
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, ICommentSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const activatedComment = await commentRepo.updateByField({
@@ -222,29 +193,22 @@ router.post(
  * @route POST /comment/Deactivate
  * @group Comment - Operations about comment
  * @param {number} id.body.required
- * @returns {CommentModel.model} 200
+ * @returns {CommentSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Deactivate",
-  async function (req: IRequestWithToken, res: Response) {
+  isAdmin,
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, ICommentSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const deactivatedComment = await userRepo.updateByField({

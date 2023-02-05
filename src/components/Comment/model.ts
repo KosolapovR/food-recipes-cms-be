@@ -1,7 +1,12 @@
-import { IComment } from "./interface";
+import {
+  ICommentCreateDTO,
+  ICommentGroupDTO,
+  ICommentSingleDTO,
+  ICommentUpdateDTO,
+} from "./interface";
 
 /**
- * @typedef CommentModel
+ * @typedef CommentSingleDtoModel
  * @property {string} id.required
  * @property {string} text.required
  * @property {string} status
@@ -9,6 +14,40 @@ import { IComment } from "./interface";
  * @property {string} userId.required
  * @property {string} recipeId.required
  */
-export interface CommentModel {
-  model: IComment;
+export interface CommentSingleDtoModel {
+  model: ICommentSingleDTO;
+}
+
+/**
+ * @typedef CommentGroupDtoModel
+ * @property {string} id.required
+ * @property {string} text.required
+ * @property {string} status
+ * @property {string} date
+ * @property {string} userId.required
+ * @property {string} recipeId.required
+ */
+export interface CommentGroupDtoModel {
+  model: ICommentGroupDTO;
+}
+
+/**
+ * @typedef CommentCreateDtoModel
+ * @property {string} text.required
+ * @property {string} userId.required
+ * @property {string} recipeId.required
+ */
+export interface CommentCreateDtoModel {
+  model: ICommentCreateDTO;
+}
+
+/**
+ * @typedef CommentCreateDtoModel
+ * @property {string} id.required
+ * @property {string} text.required
+ * @property {string} userId.required
+ * @property {string} recipeId.required
+ */
+export interface CommentUpdateDtoModel {
+  model: ICommentUpdateDTO;
 }

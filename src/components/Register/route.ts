@@ -11,9 +11,9 @@ const router = express.Router();
  * @group Register - Operations about register
  * @param {string} email.body.required
  * @param {string} password.body.required
- * @returns {UserModel.model} 201
+ * @returns {UserSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/", async function (req: Request, res: Response) {
   try {
@@ -49,7 +49,7 @@ router.post("/", async function (req: Request, res: Response) {
 
     const secret: Secret = process.env.TOKEN_KEY || "";
     // Create token
-    const token = jwt.sign({ user_id: result.insertId, email }, secret, {
+    const token = jwt.sign({ user_id: result.insertId }, secret, {
       expiresIn: "2h",
     });
     // save user token

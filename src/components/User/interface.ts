@@ -1,12 +1,21 @@
 import { RowDataPacket } from "mysql2";
+import { ActivationUnionStatusType, CommonUpdateDTOType } from "../../types";
 
-export type UserStatusType = "inactive" | "active";
-
-export interface IUser extends RowDataPacket {
+export interface IUserGroupDTO extends RowDataPacket {
   id: string;
   email: string;
-  password?: string;
-  token: string;
   isAdmin?: boolean;
-  status: UserStatusType;
+  status: ActivationUnionStatusType;
 }
+
+export interface IUserSingleDTO extends IUserGroupDTO {
+  token: string;
+}
+
+export type IUserCreateDTO = Omit<IUserSingleDTO, "id" | "status" | "token"> & {
+  password?: string;
+};
+
+export type IUserUpdateDTO = CommonUpdateDTOType<
+  IUserCreateDTO & { status?: string }
+>;

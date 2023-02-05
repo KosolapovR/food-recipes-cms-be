@@ -1,45 +1,35 @@
 import express, { Request, Response } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-import { protectedRoute } from "../../middlewares/protectedRoute";
-import { IRequestWithToken } from "../../types";
+import { protectedRoute, isAdmin } from "../../middlewares";
+import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
+import { IRecipeSingleDTO } from "../Recipe/interface";
+import { IUserSingleDTO, IUserUpdateDTO } from "./interface";
 import { userRepo } from "./repo";
-import { IUser } from "./interface";
-import { IUpdateUserParams } from "./repo/types";
 
 const router = express.Router();
 
-router.use(protectedRoute);
+router.use(protectedRoute).use(isAdmin);
 
 /**
  * @route PUT /user/Update
  * @group User - Operations about user
- * @param {number} id.body.required
- * @param {string} email.body.required
- * @param {string} password.body
- * @param {status} status.body
- * @returns {UserModel.model} 200
+ * @param {UserUpdateDtoModel.model} data.body.required
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.put(
   "/Update",
-  async function (req: Request<{}, IUser, IUpdateUserParams>, res: Response) {
+  async function (
+    req: IRequest<IUserUpdateDTO, IUserSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id, email, password, isAdmin, status } = req.body;
 
       if (!email && !password && typeof isAdmin === "undefined") {
         return res.status(400).send("All input is required");
-      }
-
-      const [oldUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (oldUser) {
-        return res.status(409).send("User with same email already exist");
       }
 
       //Encrypt user password
@@ -69,30 +59,42 @@ router.put(
 /**
  * @route GET /user
  * @group User - Operations about user
- * @returns {Array.<UserModel>} 200
+ * @returns {Array.<UserGroupDtoModel>} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
-  try {
-    const result = await userRepo.getAll();
-    if (!result) {
-      return res.status(400).send("Cannot get users");
-    }
+router.get(
+  "/",
+  async function (req: IRequest<void, IUserSingleDTO>, res: Response) {
+    const { status } = req.query;
+    try {
+      let result;
+      if (status) {
+        result = await userRepo.getByField({
+          fieldName: "status",
+          fieldValue: status as string,
+        });
+      } else {
+        result = await userRepo.getAll();
+      }
+      if (!result) {
+        return res.status(400).send("Cannot get users");
+      }
 
-    return res.status(200).send({ data: result });
-  } catch (error) {
-    return res.status(500).json({ error: error });
+      return res.status(200).send({ data: result });
+    } catch (error) {
+      return res.status(500).json({ error: error });
+    }
   }
-});
+);
 
 /**
  * @route GET /user/{id}
- * @param {string} id.params.required
  * @group User - Operations about user
- * @returns {UserModel.model} 200
+ * @param {string} id.params.required
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
@@ -117,7 +119,7 @@ router.get("/:id", async function (req: Request, res: Response) {
  *  @param {number} id.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/Delete", async function (req: Request, res: Response) {
   try {
@@ -144,7 +146,7 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @param {Array<number>} ids.body.required
  * @returns {} 204
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post("/BatchDelete", async function (req: Request, res: Response) {
   try {
@@ -169,29 +171,21 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  * @route POST /user/Activate
  * @group User - Operations about user
  * @param {number} id.body.required
- * @returns {UserModel.model} 200
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Activate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const activatedUser = await userRepo.updateByField({
@@ -215,29 +209,21 @@ router.post(
  * @route POST /user/Deactivate
  * @group User - Operations about user
  * @param {number} id.body.required
- * @returns {UserModel.model} 200
+ * @returns {UserSingleDtoModel.model} 200
  * @returns {Error}  400 - All input is required
- * @returns {Error}  403 - Wrong credentials
+ * @returns {Error}  401 - Wrong credentials
  */
 router.post(
   "/Deactivate",
-  async function (req: IRequestWithToken, res: Response) {
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, IUserSingleDTO>,
+    res: Response
+  ) {
     try {
       const { id } = req.body;
 
       if (!id || !req.token) {
         return res.status(400).send("All input is required");
-      }
-
-      const { email } = jwt.decode(req.token) as JwtPayload;
-
-      const [currentUser] = await userRepo.getByField({
-        fieldName: "email",
-        fieldValue: email,
-      });
-
-      if (!currentUser.isAdmin) {
-        return res.status(401).send("Not enough rights for operation");
       }
 
       const deactivatedUser = await userRepo.updateByField({

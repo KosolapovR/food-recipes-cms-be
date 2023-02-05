@@ -6,48 +6,63 @@ import {
   IFieldNameValue,
 } from "../../../types";
 import {
-  ICommentCreateDTO,
-  ICommentGroupDTO,
-  ICommentSingleDTO,
+  ICategoryCreateDTO,
+  ICategoryGroupDTO,
+  ICategorySingleDTO,
+  ICategoryUpdateDTO,
 } from "../interface";
-import { INACTIVE_STATUS } from "../../../consts";
-
-const getById = async (id: number) => {
-  const db = await getConnection();
-  const [rows] = await db.query<ICommentSingleDTO[]>(
-    `SELECT * FROM comments WHERE comments.id=?`,
-    [id]
-  );
-  const comment: ICommentSingleDTO | undefined = rows[0];
-  return comment;
-};
 
 const getAll = async () => {
   const db = await getConnection();
-  const [rows] = await db.query<ICommentGroupDTO[]>("SELECT * FROM comments");
-
+  const [rows] = await db.query<ICategoryGroupDTO[]>(
+    "SELECT * FROM categories"
+  );
   return rows;
+};
+
+const getById = async (id: number) => {
+  const db = await getConnection();
+  const [rows] = await db.query<ICategorySingleDTO[]>(
+    `SELECT * FROM categories WHERE id=?`,
+    [id]
+  );
+  const category: ICategorySingleDTO | undefined = rows[0];
+
+  const [subCategories] = await db.query<ICategorySingleDTO[]>(
+    `SELECT * FROM categories WHERE parentId=?`,
+    [id]
+  );
+  category.subCategories = subCategories;
+  return category;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [rows] = await db.query<ICommentGroupDTO[]>(
-    `SELECT * FROM comments WHERE ${fieldName}=?`,
+  const [rows] = await db.query<ICategorySingleDTO[]>(
+    `SELECT * FROM categories WHERE ${fieldName}=?`,
     [fieldValue]
   );
-
   return rows;
 };
 
-const add = async ({ text, userId, recipeId }: ICommentCreateDTO) => {
+const add = async ({ name, parentId }: ICategoryCreateDTO) => {
   const db = await getConnection();
-
   const [result] = await db.query<ResultSetHeader>(
-    `INSERT INTO comments (text, userId, recipeId, date, status) values (?, ?, ?, ?, ?)`,
-    [text, userId, recipeId, new Date(), INACTIVE_STATUS]
+    `INSERT INTO categories (name, parentId) values (?, ?)`,
+    [name, parentId]
   );
 
   return await getById(result.insertId);
+};
+
+const update = async ({ id, name, parentId }: ICategoryUpdateDTO) => {
+  const db = await getConnection();
+  await db.query<ResultSetHeader>(
+    `UPDATE categories SET name=?, parentId=? WHERE id=?`,
+    [name, parentId, id]
+  );
+
+  return await getById(id);
 };
 
 const updateByField = async ({
@@ -57,7 +72,7 @@ const updateByField = async ({
 }: IFieldNameValue & { id: number }) => {
   const db = await getConnection();
   await db.query<ResultSetHeader>(
-    `UPDATE comments SET ${fieldName}=? WHERE id=?`,
+    `UPDATE categories SET ${fieldName}=? WHERE id=?`,
     [fieldValue, id]
   );
   return await getById(id);
@@ -65,9 +80,8 @@ const updateByField = async ({
 
 const removeById = async ({ id }: CommonDeleteDTOType) => {
   const db = await getConnection();
-
   const [result] = await db.query<ResultSetHeader>(
-    `DELETE FROM comments WHERE id=?`,
+    `DELETE FROM categories WHERE id=?`,
     [id]
   );
   return result.affectedRows === 1;
@@ -78,7 +92,7 @@ const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   let deletedCount = 0;
   for (const id of ids) {
     const [result] = await db.query<ResultSetHeader>(
-      `DELETE FROM comments WHERE id=?`,
+      `DELETE FROM categories WHERE id=?`,
       [id]
     );
     if (result.affectedRows === 1) deletedCount++;
@@ -87,13 +101,15 @@ const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   return deletedCount > 0;
 };
 
-const commentRepo = {
+const categoryRepo = {
   getById,
   getAll,
   getByField,
   add,
+  update,
   updateByField,
   removeById,
   removeAllByIds,
 };
-export { commentRepo };
+
+export { categoryRepo };

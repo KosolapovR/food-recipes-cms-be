@@ -1,12 +1,22 @@
 import { RowDataPacket } from "mysql2";
+import { ActivationUnionStatusType, CommonUpdateDTOType } from "../../types";
 
-export type CommentStatusType = "active" | "inactive";
-
-export interface IComment extends RowDataPacket {
+export interface ICommentSingleDTO extends RowDataPacket {
   id: string;
   text: string;
-  status: CommentStatusType;
+  status: ActivationUnionStatusType;
   date: string;
   userId: string;
   recipeId: string;
 }
+
+export type ICommentGroupDTO = ICommentSingleDTO;
+
+export type ICommentCreateDTO = Omit<
+  ICommentSingleDTO,
+  "id" | "status" | "date"
+>;
+
+export type ICommentUpdateDTO = CommonUpdateDTOType<
+  ICommentCreateDTO & { status?: string }
+>;

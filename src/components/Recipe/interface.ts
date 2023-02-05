@@ -1,5 +1,6 @@
 import { RowDataPacket } from "mysql2";
-import { IComment } from "../Comment/interface";
+import { ICommentSingleDTO } from "../Comment/interface";
+import { ActivationUnionStatusType, CommonUpdateDTOType } from "../../types";
 
 export interface IRecipeStep extends RowDataPacket {
   id: number;
@@ -8,13 +9,24 @@ export interface IRecipeStep extends RowDataPacket {
   imagePath?: string;
 }
 
-export type RecipeStatusType = "inactive" | "active";
-
-export interface IRecipe extends RowDataPacket {
+export interface IRecipeGroupDTO extends RowDataPacket {
   id: number;
   title: string;
-  steps: IRecipeStep[];
-  comments: IComment[];
-  status: RecipeStatusType;
+  categoryId: string;
+  status: ActivationUnionStatusType;
   previewImagePath: string;
 }
+
+export interface IRecipeSingleDTO extends IRecipeGroupDTO {
+  steps: IRecipeStep[];
+  comments: ICommentSingleDTO[];
+}
+
+export type IRecipeCreateDTO = Omit<
+  IRecipeSingleDTO,
+  "id" | "comments" | "status"
+>;
+
+export type IRecipeUpdateDTO = CommonUpdateDTOType<
+  IRecipeCreateDTO & { status?: string }
+>;
