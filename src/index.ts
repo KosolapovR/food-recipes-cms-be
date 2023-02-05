@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import createPino from "pino-http";
-const pino = createPino({ transport: { target: "pino-pretty" } });
+export const pino = createPino({ transport: { target: "pino-pretty" } });
 
 //@ts-ignore
 import swaggerGenerator from "express-swagger-generator";

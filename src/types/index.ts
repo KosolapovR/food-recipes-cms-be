@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
 export interface IFieldNameValue {
   fieldName: string;
@@ -32,3 +33,5 @@ export type CommonBatchDeleteDTOType = {
 };
 
 export type ActivationUnionStatusType = "active" | "inactive";
+
+export type AppJwtPayload = JwtPayload & { user_id: number };

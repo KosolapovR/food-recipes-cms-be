@@ -4,6 +4,10 @@ import express, { Request, Response } from "express";
 import { body } from "express-validator";
 
 import { userRepo } from "../User/repo";
+import { AppJwtPayload, IRequestWithToken } from "../../types";
+import { IUserSingleDTO } from "../User/interface";
+import { pino } from "../../index";
+import { protectedRoute } from "../../middlewares";
 
 const router = express.Router();
 
@@ -51,12 +55,35 @@ router.post(
           });
 
           // return authorized user
-          return res.status(201).json(user);
+          return res.status(201).json({ data: user });
         }
       );
     } catch (error) {
       return res.status(500).json({ error: error });
     }
+  }
+);
+
+/**
+ * @route GET /auth/me
+ * @group Auth - Operations about auth
+ *  @returns {Array.<UserSingleDtoModel>} 200
+ *  @returns {Error}  401 - Wrong credentials
+ **/
+router.get(
+  "/me",
+  protectedRoute,
+  async (req: IRequestWithToken<any, IUserSingleDTO>, res: Response) => {
+    pino.logger.info(`Request`, req);
+    const jwtPayload = jwt.decode(req.token) as AppJwtPayload;
+    if (!jwtPayload) return res.status(404).send({});
+
+    const { user_id } = jwtPayload;
+    const user = await userRepo.getById(user_id);
+
+    if (!user) return res.status(404).send({});
+
+    return res.status(200).json({ data: user });
   }
 );
 
