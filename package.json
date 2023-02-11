@@ -1,6 +1,6 @@
 {
   "name": "cms-be",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "CMS back-end for demo food recipes project",
   "main": "index.js",
   "scripts": {
