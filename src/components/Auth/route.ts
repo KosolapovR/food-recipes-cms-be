@@ -54,6 +54,8 @@ router.post(
             expiresIn: "2h",
           });
 
+          delete user.password;
+
           // return authorized user
           return res.status(201).json({ data: user });
         }

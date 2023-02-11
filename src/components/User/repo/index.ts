@@ -24,7 +24,7 @@ const getAll = async () => {
 const getById = async (id: number) => {
   const db = await getConnection();
   const [rows] = await db.query<IUserSingleDTO[]>(
-    `SELECT * FROM users WHERE id=?`,
+    `SELECT id, email, isAdmin, status FROM users WHERE id=?`,
     [id]
   );
   const user: IUserSingleDTO | undefined = rows[0];
