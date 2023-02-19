@@ -68,7 +68,7 @@ const updateByField = async ({
     `UPDATE comments SET ${fieldName}=? WHERE id=?`,
     [fieldValue, id]
   );
-  return await getById(id.toString());
+  return await getById(id);
 };
 
 const removeById = async ({ id }: CommonDeleteDTOType) => {

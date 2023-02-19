@@ -63,9 +63,18 @@ router.post(
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.get("/", isAdmin, async function (req: Request, res: Response) {
+router.get("/", async function (req: Request, res: Response) {
+  const { status } = req.query;
   try {
-    const result = await commentRepo.getAll();
+    let result;
+    if (status) {
+      result = await commentRepo.getByField({
+        fieldName: "status",
+        fieldValue: status as string,
+      });
+    } else {
+      result = await commentRepo.getAll();
+    }
     if (!result) {
       return res.status(400).send("Cannot get comments");
     }
