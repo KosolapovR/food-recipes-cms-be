@@ -121,8 +121,8 @@ router.get("/", async function (req: Request, res: Response) {
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
-    const id = parseInt(req.params.id);
-    if (!id || Number.isNaN(id)) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).send(`Cannot get category by id ${req.params.id}`);
     }
     const result = await categoryRepo.getById(id);

@@ -1,4 +1,6 @@
 import { ResultSetHeader } from "mysql2/promise";
+
+import { INACTIVE_STATUS } from "../../../consts";
 import { getConnection } from "../../../db_connection";
 import {
   CommonBatchDeleteDTOType,
@@ -10,22 +12,31 @@ import {
   ICommentGroupDTO,
   ICommentSingleDTO,
 } from "../interface";
-import { INACTIVE_STATUS } from "../../../consts";
+import { recipeRepo } from "../../Recipe/repo";
+import { userRepo } from "../../User/repo";
 
-const getById = async (id: number) => {
+const getById = async (id: string) => {
   const db = await getConnection();
   const [rows] = await db.query<ICommentSingleDTO[]>(
     `SELECT * FROM comments WHERE comments.id=?`,
     [id]
   );
-  const comment: ICommentSingleDTO | undefined = rows[0];
+  const comment = rows[0];
+  if (comment) {
+    const { recipeId, userId } = comment;
+    const [recipe, user] = await Promise.all([
+      recipeRepo.getById(recipeId),
+      userRepo.getById(userId),
+    ]);
+    comment.recipe = recipe;
+    comment.user = user;
+  }
   return comment;
 };
 
 const getAll = async () => {
   const db = await getConnection();
   const [rows] = await db.query<ICommentGroupDTO[]>("SELECT * FROM comments");
-
   return rows;
 };
 
@@ -35,37 +46,33 @@ const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
     `SELECT * FROM comments WHERE ${fieldName}=?`,
     [fieldValue]
   );
-
   return rows;
 };
 
 const add = async ({ text, userId, recipeId }: ICommentCreateDTO) => {
   const db = await getConnection();
-
   const [result] = await db.query<ResultSetHeader>(
     `INSERT INTO comments (text, userId, recipeId, date, status) values (?, ?, ?, ?, ?)`,
     [text, userId, recipeId, new Date(), INACTIVE_STATUS]
   );
-
-  return await getById(result.insertId);
+  return await getById(result.insertId.toString());
 };
 
 const updateByField = async ({
   fieldName,
   fieldValue,
   id,
-}: IFieldNameValue & { id: number }) => {
+}: IFieldNameValue & { id: string }) => {
   const db = await getConnection();
   await db.query<ResultSetHeader>(
     `UPDATE comments SET ${fieldName}=? WHERE id=?`,
     [fieldValue, id]
   );
-  return await getById(id);
+  return await getById(id.toString());
 };
 
 const removeById = async ({ id }: CommonDeleteDTOType) => {
   const db = await getConnection();
-
   const [result] = await db.query<ResultSetHeader>(
     `DELETE FROM comments WHERE id=?`,
     [id]
@@ -83,7 +90,6 @@ const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
     );
     if (result.affectedRows === 1) deletedCount++;
   }
-
   return deletedCount > 0;
 };
 

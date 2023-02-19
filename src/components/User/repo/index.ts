@@ -21,7 +21,7 @@ const getAll = async () => {
   return rows;
 };
 
-const getById = async (id: number) => {
+const getById = async (id: string) => {
   const db = await getConnection();
   const [rows] = await db.query<IUserSingleDTO[]>(
     `SELECT id, email, isAdmin, status FROM users WHERE id=?`,
@@ -75,7 +75,7 @@ const updateByField = async ({
   fieldName,
   fieldValue,
   id,
-}: IFieldNameValue & { id: number }) => {
+}: IFieldNameValue & { id: string }) => {
   const db = await getConnection();
   await db.query<ResultSetHeader>(
     `UPDATE users SET ${fieldName}=? WHERE id=?`,

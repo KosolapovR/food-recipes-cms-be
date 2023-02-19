@@ -21,11 +21,11 @@ export type IRequestWithToken<InputType, OutputType> = IRequest<
 };
 
 export type CommonUpdateDTOType<T> = {
-  id: number;
+  id: string;
 } & T;
 
 export type CommonDeleteDTOType = {
-  id: number;
+  id: string;
 };
 
 export type CommonBatchDeleteDTOType = {
@@ -34,4 +34,4 @@ export type CommonBatchDeleteDTOType = {
 
 export type ActivationUnionStatusType = "active" | "inactive";
 
-export type AppJwtPayload = JwtPayload & { user_id: number };
+export type AppJwtPayload = JwtPayload & { user_id: string };

@@ -15,15 +15,15 @@ import {
 } from "../interface";
 import { INACTIVE_STATUS } from "../../../consts";
 
-const getById = async (id: number) => {
+const getById = async (id: string) => {
   const db = await getConnection();
   const [rows] = await db.query<IRecipeSingleDTO[]>(
     `SELECT * FROM recipes WHERE recipes.id=?`,
     [id]
   );
-  if (!rows) return rows;
+  if (!rows) return undefined;
 
-  const recipe: IRecipeSingleDTO | undefined = rows[0];
+  const recipe = rows[0];
   if (!recipe) return recipe;
 
   const [steps] = await db.query<IRecipeStep[]>(
@@ -82,7 +82,7 @@ const add = async ({ title, steps, previewImagePath }: IRecipeCreateDTO) => {
     );
   }
 
-  return await getById(result.insertId);
+  return await getById(result.insertId.toString());
 };
 
 const update = async ({
@@ -120,7 +120,7 @@ const updateByField = async ({
   fieldName,
   fieldValue,
   id,
-}: IFieldNameValue & { id: number }) => {
+}: IFieldNameValue & { id: string }) => {
   const db = await getConnection();
   await db.query<ResultSetHeader>(
     `UPDATE recipes SET ${fieldName}=? WHERE id=?`,

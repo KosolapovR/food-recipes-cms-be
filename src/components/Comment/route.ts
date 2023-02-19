@@ -1,11 +1,16 @@
 import express, { Request, Response } from "express";
 import { body } from "express-validator";
+import jwt from "jsonwebtoken";
 
 import { protectedRoute, isAdmin } from "../../middlewares";
-import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
-import { commentRepo } from "./repo";
-import { userRepo } from "../User/repo";
+import {
+  AppJwtPayload,
+  CommonDeleteDTOType,
+  IRequest,
+  IRequestWithToken,
+} from "../../types";
 import { ICommentCreateDTO, ICommentSingleDTO } from "./interface";
+import { commentRepo } from "./repo";
 
 const router = express.Router();
 
@@ -58,7 +63,7 @@ router.post(
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
+router.get("/", isAdmin, async function (req: Request, res: Response) {
   try {
     const result = await commentRepo.getAll();
     if (!result) {
@@ -81,8 +86,8 @@ router.get("/", async function (req: Request, res: Response) {
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
-    const id = parseInt(req.params.id);
-    if (!id || Number.isNaN(id)) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).send(`Cannot get comment by id ${req.params.id}`);
     }
     const result = await commentRepo.getById(id);
@@ -104,24 +109,39 @@ router.get("/:id", async function (req: Request, res: Response) {
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post("/Delete", async function (req: Request, res: Response) {
-  try {
-    const { id } = req.body;
+router.post(
+  "/Delete",
+  async function (
+    req: IRequestWithToken<CommonDeleteDTOType, any>,
+    res: Response
+  ) {
+    try {
+      const { id } = req.body;
 
-    if (!id) {
-      return res.status(400).send("All input is required");
+      if (!id) {
+        return res.status(400).send("All input is required");
+      }
+      const jwtPayload = jwt.decode(req.token) as AppJwtPayload;
+      if (!jwtPayload) return res.status(404).send({});
+
+      const { user_id } = jwtPayload;
+      const commentToDelete = await commentRepo.getById(id);
+
+      if (commentToDelete && user_id !== commentToDelete.userId) {
+        return res.status(400).send("Cannot delete other comment");
+      }
+
+      const result = await commentRepo.removeById({ id });
+      if (!result) {
+        return res.status(400).send("Cannot delete comment");
+      }
+
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const result = await commentRepo.removeById({ id });
-    if (!result) {
-      return res.status(400).send("Cannot delete comment");
-    }
-
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).json({ error: error });
   }
-});
+);
 
 /**
  * @route POST /comment/BatchDelete
@@ -131,24 +151,28 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post("/BatchDelete", async function (req: Request, res: Response) {
-  try {
-    const { ids } = req.body;
+router.post(
+  "/BatchDelete",
+  isAdmin,
+  async function (req: Request, res: Response) {
+    try {
+      const { ids } = req.body;
 
-    if (!ids || ids.length === 0) {
-      return res.status(400).send("All input is required");
+      if (!ids || ids.length === 0) {
+        return res.status(400).send("All input is required");
+      }
+
+      const result = await commentRepo.removeAllByIds({ ids });
+      if (!result) {
+        return res.status(400).send("Cannot delete comment");
+      }
+
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const result = await commentRepo.removeAllByIds({ ids });
-    if (!result) {
-      return res.status(400).send("Cannot delete comment");
-    }
-
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).json({ error: error });
   }
-});
+);
 
 /**
  * @route POST /comment/Activate
@@ -211,7 +235,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const deactivatedComment = await userRepo.updateByField({
+      const deactivatedComment = await commentRepo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "inactive",

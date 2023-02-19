@@ -20,7 +20,7 @@ const getAll = async () => {
   return rows;
 };
 
-const getById = async (id: number) => {
+const getById = async (id: string) => {
   const db = await getConnection();
   const [rows] = await db.query<ICategorySingleDTO[]>(
     `SELECT * FROM categories WHERE id=?`,
@@ -52,7 +52,7 @@ const add = async ({ name, parentId }: ICategoryCreateDTO) => {
     [name, parentId]
   );
 
-  return await getById(result.insertId);
+  return await getById(result.insertId.toString());
 };
 
 const update = async ({ id, name, parentId }: ICategoryUpdateDTO) => {
@@ -69,7 +69,7 @@ const updateByField = async ({
   fieldName,
   fieldValue,
   id,
-}: IFieldNameValue & { id: number }) => {
+}: IFieldNameValue & { id: string }) => {
   const db = await getConnection();
   await db.query<ResultSetHeader>(
     `UPDATE categories SET ${fieldName}=? WHERE id=?`,

@@ -65,6 +65,7 @@ router.put(
  */
 router.get(
   "/",
+  isAdmin,
   async function (req: IRequest<void, IUserSingleDTO>, res: Response) {
     const { status } = req.query;
     try {
@@ -98,8 +99,8 @@ router.get(
  */
 router.get("/:id", async function (req: Request, res: Response) {
   try {
-    const id = parseInt(req.params.id);
-    if (!id || Number.isNaN(id)) {
+    const { id } = req.params;
+    if (!id) {
       return res.status(400).send(`Cannot get user by id ${req.params.id}`);
     }
     const result = await userRepo.getById(id);
@@ -121,7 +122,7 @@ router.get("/:id", async function (req: Request, res: Response) {
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post("/Delete", async function (req: Request, res: Response) {
+router.post("/Delete", isAdmin, async function (req: Request, res: Response) {
   try {
     const { id } = req.body;
 
@@ -148,24 +149,28 @@ router.post("/Delete", async function (req: Request, res: Response) {
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post("/BatchDelete", async function (req: Request, res: Response) {
-  try {
-    const { ids } = req.body;
+router.post(
+  "/BatchDelete",
+  isAdmin,
+  async function (req: Request, res: Response) {
+    try {
+      const { ids } = req.body;
 
-    if (!ids || ids.length === 0) {
-      return res.status(400).send("All input is required");
+      if (!ids || ids.length === 0) {
+        return res.status(400).send("All input is required");
+      }
+
+      const result = await userRepo.removeAllByIds({ ids });
+      if (!result) {
+        return res.status(400).send("Cannot delete users");
+      }
+
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(500).json({ error: error });
     }
-
-    const result = await userRepo.removeAllByIds({ ids });
-    if (!result) {
-      return res.status(400).send("Cannot delete users");
-    }
-
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).json({ error: error });
   }
-});
+);
 
 /**
  * @route POST /user/Activate
@@ -177,6 +182,7 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
  */
 router.post(
   "/Activate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, IRecipeSingleDTO>,
     res: Response
@@ -215,6 +221,7 @@ router.post(
  */
 router.post(
   "/Deactivate",
+  isAdmin,
   async function (
     req: IRequestWithToken<CommonDeleteDTOType, IUserSingleDTO>,
     res: Response

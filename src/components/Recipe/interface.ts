@@ -1,16 +1,16 @@
 import { RowDataPacket } from "mysql2";
-import { ICommentSingleDTO } from "../Comment/interface";
+import { ICommentGroupDTO } from "../Comment/interface";
 import { ActivationUnionStatusType, CommonUpdateDTOType } from "../../types";
 
 export interface IRecipeStep extends RowDataPacket {
-  id: number;
+  id: string;
   title?: string;
   text: string;
   imagePath?: string;
 }
 
 export interface IRecipeGroupDTO extends RowDataPacket {
-  id: number;
+  id: string;
   title: string;
   categoryId: string;
   status: ActivationUnionStatusType;
@@ -19,7 +19,7 @@ export interface IRecipeGroupDTO extends RowDataPacket {
 
 export interface IRecipeSingleDTO extends IRecipeGroupDTO {
   steps: IRecipeStep[];
-  comments: ICommentSingleDTO[];
+  comments: ICommentGroupDTO[];
 }
 
 export type IRecipeCreateDTO = Omit<
