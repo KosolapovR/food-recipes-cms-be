@@ -5,7 +5,7 @@ export interface ICategorySingleDTO extends RowDataPacket {
   id: string;
   name: string;
   subCategories?: ICategorySingleDTO[];
-  parentId?: number;
+  parentId?: string;
 }
 
 export interface ICategoryGroupDTO extends RowDataPacket {
@@ -15,7 +15,7 @@ export interface ICategoryGroupDTO extends RowDataPacket {
 
 export interface ICategoryCreateDTO {
   name: string;
-  parentId?: number;
+  parentId?: string;
 }
 
 export type ICategoryUpdateDTO = CommonUpdateDTOType<ICategoryCreateDTO>;

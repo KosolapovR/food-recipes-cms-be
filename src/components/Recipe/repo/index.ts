@@ -13,7 +13,7 @@ import {
   IRecipeStep,
   IRecipeUpdateDTO,
 } from "../interface";
-import { INACTIVE_STATUS } from "../../../consts";
+import { ACTIVE_STATUS, INACTIVE_STATUS } from "../../../consts";
 
 const getById = async (id: string) => {
   const db = await getConnection();
@@ -41,39 +41,46 @@ const getById = async (id: string) => {
 
 const getAll = async () => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipeGroupDTO[]>("SELECT * FROM recipes");
+  const [recipes] = await db.query<IRecipeGroupDTO[]>(
+    "SELECT r.*, " +
+      "sum(CASE WHEN c.status = 'active' THEN 1 ELSE 0 END) AS commentCount, " +
+      "COUNT(l.id) AS likeCount " +
+      "FROM recipes AS r " +
+      "LEFT JOIN comments AS c ON r.id = c.recipeId " +
+      "LEFT JOIN likes AS l ON r.id = l.recipeId " +
+      "GROUP BY r.id"
+  );
   return recipes;
 };
 
 const getByField = async ({ fieldName, fieldValue }: IFieldNameValue) => {
   const db = await getConnection();
-  const [recipes] = await db.query<IRecipeSingleDTO[]>(
-    `SELECT * FROM recipes WHERE ${fieldName}=?`,
+
+  const [recipes] = await db.query<IRecipeGroupDTO[]>(
+    `SELECT r.*, 
+          SUM(CASE WHEN c.status = '${ACTIVE_STATUS}' THEN 1 ELSE 0 END) AS commentCount, 
+          COUNT(l.id) AS likeCount 
+          FROM recipes AS r 
+          LEFT JOIN comments AS c ON r.id = c.recipeId 
+          LEFT JOIN likes AS l ON r.id = l.recipeId 
+          WHERE r.${fieldName}=? 
+          GROUP BY r.id`,
     [fieldValue]
   );
-
-  for (const recipe of recipes) {
-    const [steps] = await db.query<IRecipeStep[]>(
-      `SELECT * FROM recipe_steps WHERE recipeId=?`,
-      [recipe.id]
-    );
-    const comments = await commentRepo.getByField({
-      fieldName: "recipeId",
-      fieldValue: recipe.id,
-    });
-
-    recipe.steps = steps;
-    recipe.comments = comments;
-  }
   return recipes;
 };
 
-const add = async ({ title, steps, previewImagePath }: IRecipeCreateDTO) => {
+const add = async ({
+  title,
+  steps,
+  previewImagePath,
+  categoryId,
+}: IRecipeCreateDTO) => {
   const db = await getConnection();
 
   const [result] = await db.query<ResultSetHeader>(
-    `INSERT INTO recipes (title, previewImagePath, status) values (?, ?, ?)`,
-    [title, previewImagePath, INACTIVE_STATUS]
+    `INSERT INTO recipes (title, previewImagePath, categoryId, status) values (?, ?, ?, ?)`,
+    [title, previewImagePath, categoryId, INACTIVE_STATUS]
   );
   for (const { title, text, imagePath } of steps) {
     await db.query<ResultSetHeader>(

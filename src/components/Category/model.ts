@@ -20,7 +20,7 @@ export interface CategorySingleDtoModel {
  * @typedef CategoryGroupDtoModel
  * @property {number} id.required
  * @property {string} name.required
- * @property {number} parentId
+ * @property {string} parentId
  */
 export interface CategoryGroupDtoModel {
   model: ICategoryGroupDTO;
@@ -29,7 +29,7 @@ export interface CategoryGroupDtoModel {
 /**
  * @typedef CategoryCreateDtoModel
  * @property {string} name.required
- * @property {number} parentId
+ * @property {string} parentId
  */
 export interface CategoryCreateDtoModel {
   model: ICategoryCreateDTO;
@@ -39,7 +39,7 @@ export interface CategoryCreateDtoModel {
  * @typedef CategoryUpdateDtoModel
  * @property {number} id.required
  * @property {string} name.required
- * @property {number} parentId
+ * @property {string} parentId
  */
 export interface CategoryUpdateDtoModel {
   model: ICategoryUpdateDTO;

@@ -15,18 +15,21 @@ export interface IRecipeGroupDTO extends RowDataPacket {
   categoryId: string;
   status: ActivationUnionStatusType;
   previewImagePath: string;
+  commentCount: number;
+  likeCount: number;
 }
 
 export interface IRecipeSingleDTO extends IRecipeGroupDTO {
   steps: IRecipeStep[];
   comments: ICommentGroupDTO[];
+  isLiked?: boolean;
 }
 
 export type IRecipeCreateDTO = Omit<
   IRecipeSingleDTO,
-  "id" | "comments" | "status"
+  "id" | "comments" | "status" | "isLiked"
 >;
 
 export type IRecipeUpdateDTO = CommonUpdateDTOType<
-  IRecipeCreateDTO & { status?: string }
+  IRecipeCreateDTO & { status?: string; isLiked?: string }
 >;
