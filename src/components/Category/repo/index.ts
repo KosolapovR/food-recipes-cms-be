@@ -3,6 +3,7 @@ import { getConnection } from "../../../db_connection";
 import {
   CommonBatchDeleteDTOType,
   CommonDeleteDTOType,
+  ICommonRepo,
   IFieldNameValue,
 } from "../../../types";
 import {
@@ -101,7 +102,12 @@ const removeAllByIds = async ({ ids }: CommonBatchDeleteDTOType) => {
   return deletedCount > 0;
 };
 
-const categoryRepo = {
+const categoryRepo: ICommonRepo<
+  ICategoryCreateDTO,
+  ICategoryUpdateDTO,
+  ICategorySingleDTO,
+  ICategoryGroupDTO
+> = {
   getById,
   getAll,
   getByField,

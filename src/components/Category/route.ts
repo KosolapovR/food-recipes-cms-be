@@ -1,19 +1,26 @@
 import express, { Request, Response } from "express";
-import { body } from "express-validator";
 
 import { isAdmin, protectedRoute } from "../../middlewares";
-import { categoryRepo } from "./repo";
+import { createRouteGenerator } from "../../route_generator";
 import {
   ICategoryCreateDTO,
+  ICategoryGroupDTO,
   ICategorySingleDTO,
   ICategoryUpdateDTO,
 } from "./interface";
-import { IRequest, IRequestWithToken } from "../../types";
+import { categoryRepo as repo } from "./repo";
 
 const router = express.Router();
 
 router.use(protectedRoute);
 
+const generatorParams = { router, repo, entityName: "category" };
+const { post, put } = createRouteGenerator<
+  ICategoryCreateDTO,
+  ICategoryUpdateDTO,
+  ICategorySingleDTO,
+  ICategoryGroupDTO
+>(generatorParams);
 /**
  * @route POST /category/Create
  * @group Category - Operations about category
@@ -22,35 +29,10 @@ router.use(protectedRoute);
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post(
-  "/Create",
-  isAdmin,
-  body("name").not().isEmpty().trim(),
-  async function (
-    req: IRequestWithToken<ICategoryCreateDTO, ICategorySingleDTO>,
-    res: Response
-  ) {
-    try {
-      const { name, parentId } = req.body;
-
-      if (!name) {
-        return res.status(400).send("Required fields: name");
-      }
-
-      const category = await categoryRepo.add({
-        name,
-        parentId,
-      });
-      if (!category) {
-        return res.status(400).send("Cannot add category");
-      }
-
-      return res.status(201).send({ data: category });
-    } catch (error) {
-      return res.status(500).json({ error: error });
-    }
-  }
-);
+post({
+  middleware: isAdmin,
+  constraintFields: ["name"],
+});
 
 /**
  * @route PUT /category/Update
@@ -60,36 +42,10 @@ router.post(
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.put(
-  "/Update",
-  isAdmin,
-  async function (
-    req: IRequest<ICategoryUpdateDTO, ICategorySingleDTO>,
-    res: Response
-  ) {
-    try {
-      const { id, name, parentId } = req.body;
-
-      if (!name) {
-        return res.status(400).send("All input is required");
-      }
-
-      const category = await categoryRepo.update({
-        id,
-        name,
-        parentId,
-      });
-
-      if (!category) {
-        return res.status(400).send("Cannot update category");
-      }
-
-      return res.status(200).send({ data: category });
-    } catch (error) {
-      return res.status(500).json({ error: error });
-    }
-  }
-);
+put({
+  middleware: isAdmin,
+  constraintFields: ["name"],
+});
 
 /**
  * @route GET /category
@@ -100,7 +56,7 @@ router.put(
  */
 router.get("/", async function (req: Request, res: Response) {
   try {
-    const result = await categoryRepo.getAll();
+    const result = await repo.getAll();
     if (!result) {
       return res.status(400).send("Cannot get categories");
     }
@@ -125,7 +81,7 @@ router.get("/:id", async function (req: Request, res: Response) {
     if (!id) {
       return res.status(400).send(`Cannot get category by id ${req.params.id}`);
     }
-    const result = await categoryRepo.getById(id);
+    const result = await repo.getById(id);
     if (!result) {
       return res.status(400).send("Cannot get category");
     }
@@ -152,7 +108,7 @@ router.post("/Delete", isAdmin, async function (req: Request, res: Response) {
       return res.status(400).send("All input is required");
     }
 
-    const result = await categoryRepo.removeById({ id });
+    const result = await repo.removeById({ id });
     if (!result) {
       return res.status(400).send("Cannot delete category");
     }
@@ -182,7 +138,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const result = await categoryRepo.removeAllByIds({ ids });
+      const result = await repo.removeAllByIds({ ids });
       if (!result) {
         return res.status(400).send("Cannot delete categories");
       }

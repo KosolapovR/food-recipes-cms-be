@@ -35,3 +35,31 @@ export type CommonBatchDeleteDTOType = {
 export type ActivationUnionStatusType = "active" | "inactive";
 
 export type AppJwtPayload = JwtPayload & { user_id: string };
+
+type GetByIdRepoType<T> = (id: string) => Promise<T>;
+type GetAllRepoType<T> = () => Promise<T[]>;
+type GetByFieldRepoType<T> = ({
+  fieldName,
+  fieldValue,
+}: IFieldNameValue) => Promise<T[]>;
+type AddRepoType<CreateDTO, SingleDTO> = (
+  body: CreateDTO
+) => Promise<SingleDTO>;
+type UpdateRepoType<UpdateDTO, SingleDTO> = (
+  body: UpdateDTO
+) => Promise<SingleDTO>;
+type UpdateSpecificFieldType = IFieldNameValue & { id: string };
+type UpdateByFieldRepoType<UpdateSpecificFieldType, SingleDTO> = (
+  body: UpdateSpecificFieldType
+) => Promise<SingleDTO>;
+
+export interface ICommonRepo<CreateDTO, UpdateDTO, SingleDTO, GroupDTO> {
+  getById: GetByIdRepoType<SingleDTO>;
+  getAll: GetAllRepoType<GroupDTO>;
+  getByField: GetByFieldRepoType<GroupDTO>;
+  add: AddRepoType<CreateDTO, SingleDTO>;
+  update: UpdateRepoType<UpdateDTO, SingleDTO>;
+  updateByField: UpdateByFieldRepoType<UpdateSpecificFieldType, SingleDTO>;
+  removeById: any;
+  removeAllByIds: any;
+}
