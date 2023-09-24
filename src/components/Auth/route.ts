@@ -6,7 +6,6 @@ import { body } from "express-validator";
 import { userRepo } from "../User/repo";
 import { AppJwtPayload, IRequestWithToken } from "../../types";
 import { IUserSingleDTO } from "../User/interface";
-import { pino } from "../../index";
 import { protectedRoute } from "../../middlewares";
 
 const router = express.Router();
@@ -22,7 +21,7 @@ const router = express.Router();
  */
 router.post(
   "/",
-  body("email").isEmail().normalizeEmail(),
+  body("email").isEmail(),
   body("password").not().isEmpty().trim(),
   async function (req: Request, res: Response) {
     try {
@@ -76,7 +75,6 @@ router.get(
   "/me",
   protectedRoute,
   async (req: IRequestWithToken<any, IUserSingleDTO>, res: Response) => {
-    pino.logger.info(`Request`, req);
     const jwtPayload = jwt.decode(req.token) as AppJwtPayload;
     if (!jwtPayload) return res.status(404).send({});
 

@@ -56,7 +56,7 @@ router.post("/", async function (req: Request, res: Response) {
     const user = { id: result.insertId, email, token };
 
     // return new user
-    return res.status(201).json(user);
+    return res.status(201).json({ data: user });
   } catch (error) {
     return res.status(500).json({ error: error });
   }
