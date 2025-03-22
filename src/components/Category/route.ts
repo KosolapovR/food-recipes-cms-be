@@ -2,20 +2,14 @@ import express, { Request, Response } from "express";
 
 import { isAdmin, protectedRoute } from "../../middlewares";
 import { createRouteGenerator } from "../../route_generator";
-import {
-  ICategoryCreateDTO,
-  ICategoryGroupDTO,
-  ICategorySingleDTO,
-  ICategoryUpdateDTO,
-} from "./interface";
+import { ICategoryCreateDTO, ICategoryGroupDTO } from "./interface";
 import { categoryRepo as repo } from "./repo";
+import { ICategorySingleDTO, ICategoryUpdateDTO } from "../Category/interface";
 
 const router = express.Router();
 
-router.use(protectedRoute);
-
 const generatorParams = { router, repo, entityName: "category" };
-const { post, put } = createRouteGenerator<
+const { get, post, put } = createRouteGenerator<
   ICategoryCreateDTO,
   ICategoryUpdateDTO,
   ICategorySingleDTO,
@@ -30,8 +24,8 @@ const { post, put } = createRouteGenerator<
  * @returns {Error}  401 - Wrong credentials
  */
 post({
-  middleware: isAdmin,
   constraintFields: ["name"],
+  middleware: isAdmin,
 });
 
 /**
@@ -43,8 +37,8 @@ post({
  * @returns {Error}  401 - Wrong credentials
  */
 put({
-  middleware: isAdmin,
   constraintFields: ["name"],
+  middleware: isAdmin,
 });
 
 /**
@@ -54,18 +48,7 @@ put({
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
-  try {
-    const result = await repo.getAll();
-    if (!result) {
-      return res.status(400).send("Cannot get categories");
-    }
-
-    return res.status(200).send({ data: result });
-  } catch (error) {
-    return res.status(500).json({ error: error });
-  }
-});
+get();
 
 /**
  * @route GET /category/{id}

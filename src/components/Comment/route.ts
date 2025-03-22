@@ -9,13 +9,28 @@ import {
   IRequest,
   IRequestWithToken,
 } from "../../types";
-import { ICommentCreateDTO, ICommentSingleDTO } from "./interface";
-import { commentRepo } from "./repo";
+import { commentRepo as repo } from "../Comment/repo";
+import { createRouteGenerator } from "../../route_generator";
+import {
+  ICommentCreateDTO,
+  ICommentGroupDTO,
+  ICommentSingleDTO,
+  ICommentUpdateDTO,
+} from "./interface";
 
 const router = express.Router();
 
 router.use(protectedRoute);
 
+const generatorParams = { router, repo, entityName: "comment" };
+const { get, post, put } = createRouteGenerator<
+  ICommentCreateDTO,
+  ICommentUpdateDTO,
+  ICommentSingleDTO,
+  ICommentGroupDTO
+>(generatorParams);
+
+const constraintFields = ["text", "userId", "recipeId"];
 /**
  * @route POST /comment/Create
  * @group Comment - Operations about comment
@@ -24,37 +39,17 @@ router.use(protectedRoute);
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post(
-  "/Create",
-  body("text").not().isEmpty().trim(),
-  body("userId").not().isEmpty().trim(),
-  body("recipeId").not().isEmpty().trim(),
-  async function (
-    req: IRequest<ICommentCreateDTO, ICommentSingleDTO>,
-    res: Response
-  ) {
-    try {
-      const { text, userId, recipeId } = req.body;
+post({ constraintFields });
 
-      if (!text || !userId || !recipeId) {
-        return res.status(400).send("All input is required");
-      }
-
-      const comment = await commentRepo.add({
-        text,
-        userId,
-        recipeId,
-      });
-      if (!comment) {
-        return res.status(400).send("Cannot add comment");
-      }
-
-      return res.status(201).send({ data: comment });
-    } catch (error) {
-      return res.status(500).json({ error });
-    }
-  }
-);
+/**
+ * @route PUT /category/Update
+ * @group Category - Operations about category
+ * @param {CategoryUpdateDtoModel.model} data.body.required
+ * @returns {CategorySingleDtoModel.model} 200
+ * @returns {Error}  400 - All input is required
+ * @returns {Error}  401 - Wrong credentials
+ */
+put({ constraintFields });
 
 /**
  * @route GET /comment
@@ -63,27 +58,7 @@ router.post(
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.get("/", async function (req: Request, res: Response) {
-  const { status } = req.query;
-  try {
-    let result;
-    if (status) {
-      result = await commentRepo.getByField({
-        fieldName: "status",
-        fieldValue: status as string,
-      });
-    } else {
-      result = await commentRepo.getAll();
-    }
-    if (!result) {
-      return res.status(400).send("Cannot get comments");
-    }
-
-    return res.status(200).send({ data: result });
-  } catch (error) {
-    return res.status(500).json({ error });
-  }
-});
+get();
 
 /**
  * @route GET /comment/{id}
@@ -99,7 +74,7 @@ router.get("/:id", async function (req: Request, res: Response) {
     if (!id) {
       return res.status(400).send(`Cannot get comment by id ${req.params.id}`);
     }
-    const result = await commentRepo.getById(id);
+    const result = await repo.getById(id);
     if (!result) {
       return res.status(400).send("Cannot get comment");
     }
@@ -134,13 +109,13 @@ router.post(
       if (!jwtPayload) return res.status(404).send({});
 
       const { user_id } = jwtPayload;
-      const commentToDelete = await commentRepo.getById(id);
+      const commentToDelete = await repo.getById(id);
 
       if (commentToDelete && user_id !== commentToDelete.userId) {
         return res.status(400).send("Cannot delete other comment");
       }
 
-      const result = await commentRepo.removeById({ id });
+      const result = await repo.removeById({ id });
       if (!result) {
         return res.status(400).send("Cannot delete comment");
       }
@@ -171,7 +146,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const result = await commentRepo.removeAllByIds({ ids });
+      const result = await repo.removeAllByIds({ ids });
       if (!result) {
         return res.status(400).send("Cannot delete comment");
       }
@@ -205,7 +180,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const activatedComment = await commentRepo.updateByField({
+      const activatedComment = await repo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "active",
@@ -244,7 +219,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const deactivatedComment = await commentRepo.updateByField({
+      const deactivatedComment = await repo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "inactive",

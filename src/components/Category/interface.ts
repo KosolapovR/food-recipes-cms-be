@@ -6,11 +6,13 @@ export interface ICategorySingleDTO extends RowDataPacket {
   name: string;
   subCategories?: ICategorySingleDTO[];
   parentId?: string;
+  parentName?: string;
 }
 
 export interface ICategoryGroupDTO extends RowDataPacket {
   id: string;
   name: string;
+  parentName?: string;
 }
 
 export interface ICategoryCreateDTO {

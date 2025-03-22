@@ -16,7 +16,7 @@ import {
 const getAll = async () => {
   const db = await getConnection();
   const [rows] = await db.query<ICategoryGroupDTO[]>(
-    "SELECT * FROM categories"
+    `SELECT c.name, c.id, p.name AS 'parentName' FROM categories c, categories p WHERE c.parentId = p.id`
   );
   return rows;
 };

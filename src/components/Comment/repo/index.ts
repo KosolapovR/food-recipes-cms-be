@@ -11,9 +11,11 @@ import {
   ICommentCreateDTO,
   ICommentGroupDTO,
   ICommentSingleDTO,
+  ICommentUpdateDTO,
 } from "../interface";
 import { recipeRepo } from "../../Recipe/repo";
 import { userRepo } from "../../User/repo";
+import { ICategoryUpdateDTO } from "../../Category/interface";
 
 const getById = async (id: string) => {
   const db = await getConnection();
@@ -58,6 +60,22 @@ const add = async ({ text, userId, recipeId }: ICommentCreateDTO) => {
   return await getById(result.insertId.toString());
 };
 
+const update = async ({
+  id,
+  text,
+  userId,
+  recipeId,
+  status,
+}: ICommentUpdateDTO) => {
+  const db = await getConnection();
+  await db.query<ResultSetHeader>(
+    `UPDATE comments SET text=?, userId=?, recipeId=?, status=? WHERE id=?`,
+    [text, userId, recipeId, status]
+  );
+
+  return await getById(id);
+};
+
 const updateByField = async ({
   fieldName,
   fieldValue,
@@ -98,6 +116,7 @@ const commentRepo = {
   getAll,
   getByField,
   add,
+  update,
   updateByField,
   removeById,
   removeAllByIds,

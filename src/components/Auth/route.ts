@@ -7,14 +7,15 @@ import { userRepo } from "../User/repo";
 import { AppJwtPayload, IRequestWithToken } from "../../types";
 import { IUserSingleDTO } from "../User/interface";
 import { protectedRoute } from "../../middlewares";
+import { pino } from "../../index";
 
 const router = express.Router();
 
 /**
  * @route POST /auth
  * @group Auth - Operations about auth
- * @param {string} email.body.required
- * @param {string} password.body.required
+ * @param {string} email.body.string
+ * @param {string} password.body.string
  * @returns {UserSingleDtoModel.model} 201
  * @returns {Error}  400 - All input is required
  * @returns {Error}  404 - Wrong credentials
@@ -24,6 +25,7 @@ router.post(
   body("email").isEmail(),
   body("password").not().isEmpty().trim(),
   async function (req: Request, res: Response) {
+    pino.logger.info(req);
     try {
       const { email, password } = req.body;
 

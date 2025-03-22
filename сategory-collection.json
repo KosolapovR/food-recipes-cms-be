@@ -1,0 +1,465 @@
+{
+  "info": {
+    "_postman_id": "87654321-4321-8765-4321-876543218765",
+    "name": "Auth and Categories API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User Authentication",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"admin@mail.ru\", \"password\": \"1234\"}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/auth/",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["auth", ""]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var response = pm.response.json();",
+              "if (response.token) {",
+              "    pm.globals.set(\"auth_token\", response.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Categories",
+      "item": [
+        {
+          "name": "Appetizers",
+          "item": [
+            {
+              "name": "Create Appetizers",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Appetizers\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Cold Appetizers",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Cold Appetizers\", \"parentId\": 1}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Hot Appetizers",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Hot Appetizers\", \"parentId\": 1}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Soups",
+          "item": [
+            {
+              "name": "Create Soups",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Soups\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Vegetable Soups",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Vegetable Soups\", \"parentId\": 2}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Meat Soups",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Meat Soups\", \"parentId\": 2}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Main Dishes",
+          "item": [
+            {
+              "name": "Create Main Dishes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Main Dishes\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Grilled Dishes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Grilled Dishes\", \"parentId\": 3}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Stewed Dishes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Stewed Dishes\", \"parentId\": 3}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desserts",
+          "item": [
+            {
+              "name": "Create Desserts",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Desserts\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Cakes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Cakes\", \"parentId\": 4}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Cookies",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Cookies\", \"parentId\": 4}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Drinks",
+          "item": [
+            {
+              "name": "Create Drinks",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Drinks\"}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Hot Drinks",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Hot Drinks\", \"parentId\": 5}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            },
+            {
+              "name": "Create Cold Drinks",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"name\": \"Cold Drinks\", \"parentId\": 5}"
+                },
+                "url": {
+                  "raw": "http://localhost:8080/category/Create",
+                  "host": ["localhost"],
+                  "port": "8080",
+                  "path": ["category", "Create"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

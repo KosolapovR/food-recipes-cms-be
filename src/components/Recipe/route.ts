@@ -3,12 +3,26 @@ import { body } from "express-validator";
 
 import { protectedRoute, isAdmin } from "../../middlewares";
 import { CommonDeleteDTOType, IRequest, IRequestWithToken } from "../../types";
-import { IRecipeSingleDTO, IRecipeUpdateDTO } from "./interface";
-import { recipeRepo } from "./repo";
+import {
+  IRecipeCreateDTO,
+  IRecipeGroupDTO,
+  IRecipeSingleDTO,
+  IRecipeUpdateDTO,
+} from "./interface";
+import { recipeRepo as repo } from "./repo";
+import { createRouteGenerator } from "../../route_generator";
 
 const router = express.Router();
 
 router.use(protectedRoute);
+
+const generatorParams = { router, repo, entityName: "recipe" };
+const { get, post, put } = createRouteGenerator<
+  IRecipeCreateDTO,
+  IRecipeUpdateDTO,
+  IRecipeSingleDTO,
+  IRecipeGroupDTO
+>(generatorParams);
 
 /**
  * @route POST /recipe/Create
@@ -18,32 +32,33 @@ router.use(protectedRoute);
  * @returns {Error}  400 - All input is required
  * @returns {Error}  401 - Wrong credentials
  */
-router.post(
-  "/Create",
-  body("title").not().isEmpty().trim(),
-  async function (req: Request, res: Response) {
-    try {
-      const { title, steps, previewImagePath } = req.body;
-
-      if (!(title && steps)) {
-        return res.status(400).send("Required fields: title, steps");
-      }
-
-      const recipe = await recipeRepo.add({
-        title,
-        steps,
-        previewImagePath,
-      });
-      if (!recipe) {
-        return res.status(400).send("Cannot add recipe");
-      }
-
-      return res.status(201).send({ data: recipe });
-    } catch (error) {
-      return res.status(500).json({ error: error });
-    }
-  }
-);
+post({ constraintFields: ["title"] });
+// router.post(
+//   "/Create",
+//   body("title").not().isEmpty().trim(),
+//   async function (req: Request, res: Response) {
+//     try {
+//       const { title, steps, previewImagePath } = req.body;
+//
+//       if (!(title && steps)) {
+//         return res.status(400).send("Required fields: title, steps");
+//       }
+//
+//       const recipe = await recipeRepo.add({
+//         title,
+//         steps,
+//         previewImagePath,
+//       });
+//       if (!recipe) {
+//         return res.status(400).send("Cannot add recipe");
+//       }
+//
+//       return res.status(201).send({ data: recipe });
+//     } catch (error) {
+//       return res.status(500).json({ error: error });
+//     }
+//   }
+// );
 
 /**
  * @route PUT /recipe/Update
@@ -68,7 +83,7 @@ router.put(
         return res.status(400).send("All input is required");
       }
 
-      const recipe = await recipeRepo.update({
+      const recipe = await repo.update({
         id,
         title,
         steps,
@@ -94,30 +109,31 @@ router.put(
  * @returns {Error}  400
  * @returns {Error}  401 - Wrong credentials
  */
-router.get(
-  "/",
-  async function (req: IRequest<void, IRecipeSingleDTO>, res: Response) {
-    const { status } = req.query;
-    try {
-      let result;
-      if (status) {
-        result = await recipeRepo.getByField({
-          fieldName: "status",
-          fieldValue: status as string,
-        });
-      } else {
-        result = await recipeRepo.getAll();
-      }
-
-      if (!result) {
-        return res.status(400).send("Cannot get recipes");
-      }
-      return res.status(200).send({ data: result });
-    } catch (error) {
-      return res.status(500).json({ error: error });
-    }
-  }
-);
+get({ filteredByFieldName: "status" });
+// router.get(
+//   "/",
+//   async function (req: IRequest<void, IRecipeSingleDTO>, res: Response) {
+//     const { status } = req.query;
+//     try {
+//       let result;
+//       if (status) {
+//         result = await repo.getByField({
+//           fieldName: "status",
+//           fieldValue: status as string,
+//         });
+//       } else {
+//         result = await repo.getAll();
+//       }
+//
+//       if (!result) {
+//         return res.status(400).send("Cannot get recipes");
+//       }
+//       return res.status(200).send({ data: result });
+//     } catch (error) {
+//       return res.status(500).json({ error: error });
+//     }
+//   }
+// );
 
 /**
  * @route GET /recipe/{id}
@@ -133,7 +149,7 @@ router.get("/:id", async function (req: Request, res: Response) {
     if (!id) {
       return res.status(400).send(`Cannot get recipe by id ${req.params.id}`);
     }
-    const result = await recipeRepo.getById(id);
+    const result = await repo.getById(id);
     if (!result) {
       return res.status(400).send("Cannot get recipe");
     }
@@ -160,7 +176,7 @@ router.post("/Delete", isAdmin, async function (req: Request, res: Response) {
       return res.status(400).send("All input is required");
     }
 
-    const result = await recipeRepo.removeById({ id });
+    const result = await repo.removeById({ id });
     if (!result) {
       return res.status(400).send("Cannot delete recipe");
     }
@@ -187,7 +203,7 @@ router.post("/BatchDelete", async function (req: Request, res: Response) {
       return res.status(400).send("All input is required");
     }
 
-    const result = await recipeRepo.removeAllByIds({ ids });
+    const result = await repo.removeAllByIds({ ids });
     if (!result) {
       return res.status(400).send("Cannot delete recipes");
     }
@@ -220,7 +236,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const activatedRecipe = await recipeRepo.updateByField({
+      const activatedRecipe = await repo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "active",
@@ -259,7 +275,7 @@ router.post(
         return res.status(400).send("All input is required");
       }
 
-      const deactivatedRecipe = await recipeRepo.updateByField({
+      const deactivatedRecipe = await repo.updateByField({
         id,
         fieldName: "status",
         fieldValue: "inactive",

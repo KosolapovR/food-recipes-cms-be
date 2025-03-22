@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
     const mimeTypesMap: { [key in string]: string } = {
       "image/jpeg": ".jpeg",
       "image/png": ".png",
+      "image/webp": ".webp",
     };
     cb(
       null,
@@ -31,7 +32,7 @@ const fileFilter = (
   file: Express.Multer.File,
   callback: multer.FileFilterCallback
 ) => {
-  const availableMimeTypes = ["image/jpeg", "image/png"];
+  const availableMimeTypes = ["image/jpeg", "image/png", "image/webp"];
   callback(null, availableMimeTypes.includes(file.mimetype));
 };
 

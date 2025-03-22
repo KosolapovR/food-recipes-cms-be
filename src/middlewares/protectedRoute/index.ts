@@ -9,7 +9,7 @@ import { NextFunction, Request, Response } from "express";
 import { IRequestWithToken } from "../../types";
 
 export const protectedRoute = (
-  req: IRequestWithToken<Record<string, unknown>, Record<string, unknown>>,
+  req: IRequestWithToken<any, any>,
   res: Response,
   next: NextFunction
 ) => {
